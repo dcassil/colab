@@ -25,3 +25,5 @@ export { createRoster } from "./core/index.js";
 export type { Roster } from "./core/index.js";
 export { createInteractionRegistry } from "./core/index.js";
 export type { InteractionRegistry } from "./core/index.js";
+export { createSession } from "./core/index.js";
+export type { Session, SessionDeps } from "./core/index.js";

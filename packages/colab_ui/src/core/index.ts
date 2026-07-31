@@ -12,3 +12,6 @@ export type { Roster } from "./roster.js";
 
 export { createInteractionRegistry } from "./registry.js";
 export type { InteractionRegistry } from "./registry.js";
+
+export { createSession } from "./session.js";
+export type { Session, SessionDeps } from "./session.js";
