@@ -11,7 +11,14 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./bin": {
+      "types": "./dist/bin.d.ts",
+      "import": "./dist/bin.js"
+    },
     "./package.json": "./package.json"
+  },
+  "bin": {
+    "colab-server": "./dist/bin.js"
   },
   "files": ["dist"],
   "scripts": {

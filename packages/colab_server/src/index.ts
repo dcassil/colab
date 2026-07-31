@@ -10,6 +10,13 @@ export {
 } from "./protocol-adapter.js";
 export { attachColabRelay, type RelayOptions } from "./relay.js";
 export { RoomRosterStore, toParticipant } from "./roster.js";
+export {
+  createColabServer,
+  type ColabServer,
+  type ColabSocketServer,
+  type CorsConfig,
+  type CreateColabServerOptions,
+} from "./server.js";
 export type {
   ClientToServerEvents,
   InterServerEvents,
