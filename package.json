@@ -15,11 +15,12 @@
     "build": "pnpm -r --filter \"./packages/*\" build",
     "lint": "eslint .",
     "test": "pnpm -r test",
-    "depcruise": "pnpm -r depcruise"
+    "depcruise": "depcruise --config .dependency-cruiser.cjs packages example"
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
     "@eslint/js": "^9.39.5",
+    "dependency-cruiser": "^16.10.4",
     "eslint": "^9.39.5",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^4.4.5",
