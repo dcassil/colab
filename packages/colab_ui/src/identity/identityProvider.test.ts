@@ -71,6 +71,36 @@ describe("resolveIdentity", () => {
       }),
     ).rejects.toThrow(/id/);
   });
+
+  it("rejects a missing name", async () => {
+    await expect(
+      resolveIdentity({
+        identity: { id: "a", color: "#000" } as unknown as Identity,
+      }),
+    ).rejects.toThrow(/name/);
+  });
+
+  it("rejects a missing color", async () => {
+    await expect(
+      resolveIdentity({
+        identity: { id: "a", name: "A" } as unknown as Identity,
+      }),
+    ).rejects.toThrow(/color/);
+  });
+
+  it("rejects a non-object extra", async () => {
+    await expect(
+      resolveIdentity({
+        identity: { ...id, extra: "nope" } as unknown as Identity,
+      }),
+    ).rejects.toThrow(/extra/);
+  });
+
+  it("rejects a null identity", async () => {
+    await expect(
+      resolveIdentity({ identity: null as unknown as Identity }),
+    ).rejects.toThrow(/object/);
+  });
 });
 
 describe("createIdentityProvider", () => {

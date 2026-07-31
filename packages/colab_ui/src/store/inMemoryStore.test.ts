@@ -3,6 +3,10 @@ import { describe, expect, it, vi } from "vitest";
 import type { ColabStore } from "../contracts/store.js";
 
 import { createInMemoryStore } from "./inMemoryStore.js";
+import { runStoreContract } from "./storeContract.js";
+
+// The default store passes the shared, reusable store contract suite.
+runStoreContract(() => createInMemoryStore(), "in-memory (default)");
 
 describe("createInMemoryStore", () => {
   it("satisfies the keyed ColabStore contract shape", () => {
