@@ -1,0 +1,54 @@
+# GitHub Actions CI for the `colab` monorepo (T8 / PROJ-T-0024).
+#
+# Runs the authoritative five-check gate — typecheck + lint + test + build +
+# depcruise — on every push (all branches) and every pull request. This mirrors
+# the local pre-push hook (T7) exactly, and gates every PR from day one.
+#
+# Determinism: `pnpm install --frozen-lockfile` fails if the lockfile drifts.
+# Chattiness on all-branches push is bounded by the concurrency-cancel group.
+# Nothing here encodes CMS / iframe / geometry assumptions.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request: {}
+
+# Cancel superseded runs on the same ref (NFR-001).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Depcruise (module boundaries)
+        run: pnpm depcruise
