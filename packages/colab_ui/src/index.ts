@@ -7,6 +7,12 @@
  * interactions), never by this package. Core primitives (MessageBus, Roster,
  * InteractionRegistry, Session) are added by later I2 tasks.
  *
+ * I3 also ships the DEFAULT seam implementations from here: the in-memory
+ * {@link createInMemoryStore} (and, in later I3 tasks, the default transports
+ * and identity helpers). The barrel must stay dependency-light — defaults that
+ * carry heavy optional deps (e.g. socket.io-client) are lazily imported and
+ * never pulled in at barrel load.
+ *
  * May import `colab-protocol`; must never import `colab-server`.
  */
 export type {
@@ -27,3 +33,5 @@ export { createInteractionRegistry } from "./core/index.js";
 export type { InteractionRegistry } from "./core/index.js";
 export { createSession } from "./core/index.js";
 export type { Session, SessionDeps } from "./core/index.js";
+
+export { createInMemoryStore } from "./store/index.js";
