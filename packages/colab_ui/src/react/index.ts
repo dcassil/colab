@@ -22,6 +22,12 @@ export { ColabProvider } from "./ColabProvider.js";
 export { useColab } from "./useColab.js";
 export { usePresence } from "./usePresence.js";
 export { useInteraction } from "./useInteraction.js";
+export {
+  ColabStage,
+  ColabStageContext,
+  identity,
+  useColabStage,
+} from "../coordinate/index.js";
 
 // ── Public error a consumer may catch ────────────────────────────────────────
 export { ColabProviderMissingError } from "./useColabContext.js";
@@ -32,6 +38,14 @@ export type {
   InteractionActions,
   UseInteractionResult,
 } from "./useInteraction.js";
+export type {
+  ColabStageContextValue,
+  Point,
+  PointerSampleListener,
+  PointerSampleSource,
+  StageBox,
+  Transform,
+} from "../coordinate/index.js";
 
 // ── Consumed I2/I3 types a React consumer must name at the boundary ──────────
 export type { Identity, Participant } from "colab-protocol";

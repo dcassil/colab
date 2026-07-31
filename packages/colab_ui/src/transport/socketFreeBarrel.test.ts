@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,7 +31,12 @@ const SIDE_EFFECT = /^\s*import\s+["']([^"']+)["']/gm;
 function resolveLocal(fromFile: string, spec: string): string | undefined {
   if (!spec.startsWith(".")) return undefined; // external package, not a local edge
   // Source uses ESM `.js` specifiers that map to sibling `.ts` sources.
-  return resolve(dirname(fromFile), spec).replace(/\.js$/, ".ts");
+  const withoutJs = resolve(dirname(fromFile), spec).replace(/\.js$/, "");
+  for (const ext of [".ts", ".tsx"]) {
+    const candidate = `${withoutJs}${ext}`;
+    if (existsSync(candidate)) return candidate;
+  }
+  return `${withoutJs}.ts`;
 }
 
 function staticSpecs(file: string): string[] {
