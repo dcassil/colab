@@ -10,6 +10,8 @@
  * peers and never bundles them. The curated export list is finalized in T7; the
  * additions below land as their tasks complete.
  */
+export { ColabProvider } from "./ColabProvider.js";
+
 export type {
   ColabProviderProps,
   ColabContextValue,
