@@ -1,5 +1,5 @@
 {
-  "name": "@colab/ui",
+  "name": "colab-ui",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -19,7 +19,7 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "@colab/protocol": "workspace:*"
+    "colab-protocol": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.5.0",

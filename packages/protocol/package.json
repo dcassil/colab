@@ -1,5 +1,5 @@
 {
-  "name": "@colab/protocol",
+  "name": "colab-protocol",
   "version": "0.0.0",
   "type": "module",
   "private": true,

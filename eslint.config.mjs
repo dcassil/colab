@@ -98,7 +98,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ["@colab/*/src/**", "@colab/*/dist/**", "@colab/*/src"],
+              group: ["colab-*/src/**", "colab-*/dist/**", "colab-*/src"],
               message:
                 "Public-entry discipline: import a sibling package by its name " +
                 "(its index.ts public entry), never by reaching into its src/dist internals.",
@@ -158,16 +158,16 @@ export default tseslint.config(
       // object-selector / `policies` API below.
       "boundaries/legacy-warnings": false,
       "boundaries/dependency-nodes": ["import"],
-      // Resolve the `@colab/*` workspace specifiers to each package's SOURCE
+      // Resolve the `colab-*` workspace specifiers to each package's SOURCE
       // entry (not its built `dist`), so boundaries classifies cross-package
       // imports as the sibling element rather than an external dependency.
       // This mirrors the workspace graph the build resolves via `exports`.
       "import/resolver": {
         alias: {
           map: [
-            ["@colab/protocol", "./packages/protocol/src/index.ts"],
-            ["@colab/ui", "./packages/colab_ui/src/index.ts"],
-            ["@colab/server", "./packages/colab_server/src/index.ts"],
+            ["colab-protocol", "./packages/protocol/src/index.ts"],
+            ["colab-ui", "./packages/colab_ui/src/index.ts"],
+            ["colab-server", "./packages/colab_server/src/index.ts"],
           ],
           extensions: [".ts", ".tsx", ".js"],
         },

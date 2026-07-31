@@ -58,7 +58,7 @@ importers:
 
   packages/colab_server:
     dependencies:
-      '@colab/protocol':
+      colab-protocol:
         specifier: workspace:*
         version: link:../protocol
     devDependencies:
@@ -71,7 +71,7 @@ importers:
 
   packages/colab_ui:
     dependencies:
-      '@colab/protocol':
+      colab-protocol:
         specifier: workspace:*
         version: link:../protocol
     devDependencies:

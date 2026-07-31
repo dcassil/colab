@@ -18,7 +18,7 @@
  *     - reaching into a package's internals instead of its public entry
  *     - circular deps; orphan modules
  *
- * RESOLUTION NOTE: cross-package `@colab/*` specifiers resolve (via each
+ * RESOLUTION NOTE: cross-package `colab-*` specifiers resolve (via each
  * package's `exports`) to the sibling's BUILT output — `dist/index.*`. That
  * built barrel IS the package's public entry, so the leaf/deep-import rules
  * treat `dist/index.{js,d.ts}` as the sole legal cross-package target and
@@ -52,7 +52,7 @@ module.exports = {
         pathNot: "\\.(test|spec)\\.[tj]sx?$",
       },
       to: {
-        path: "^(packages/protocol/|@colab/protocol/(src|dist)/)",
+        path: "^(packages/protocol/|colab-protocol/(src|dist)/)",
         pathNot: PUBLIC_ENTRY,
       },
     },
@@ -65,7 +65,7 @@ module.exports = {
       from: { path: "^packages/protocol/src", pathNot: "\\.(test|spec)\\.[tj]sx?$" },
       to: {
         path:
-          "^(packages/(colab_ui|colab_server)/|example/|@colab/(ui|server)($|/))",
+          "^(packages/(colab_ui|colab_server)/|example/|colab-(ui|server)($|/))",
       },
     },
 
@@ -81,9 +81,9 @@ module.exports = {
         pathNot: "\\.(test|spec)\\.[tj]sx?$",
       },
       // Matches both a resolved path (if ever symlinked) and the bare specifier.
-      // `@colab/server` is deliberately NOT a dependency of colab_ui, so the
+      // `colab-server` is deliberately NOT a dependency of colab_ui, so the
       // import is also unresolvable — caught here rather than silently ignored.
-      to: { path: "^(packages/colab_server/|@colab/server($|/))" },
+      to: { path: "^(packages/colab_server/|colab-server($|/))" },
     },
     {
       name: "server-not-to-ui",
@@ -95,7 +95,7 @@ module.exports = {
         path: "^packages/colab_server/src",
         pathNot: "\\.(test|spec)\\.[tj]sx?$",
       },
-      to: { path: "^(packages/colab_ui/|@colab/ui($|/))" },
+      to: { path: "^(packages/colab_ui/|colab-ui($|/))" },
     },
 
     /* ---- example may reach only colab_ui / protocol, never colab_server -- */
@@ -106,7 +106,7 @@ module.exports = {
         "NEVER import colab_server — the relay is a separate deployment concern.",
       severity: "error",
       from: { path: "^example/src" },
-      to: { path: "^(packages/colab_server/|@colab/server($|/))" },
+      to: { path: "^(packages/colab_server/|colab-server($|/))" },
     },
 
     /* ---- Public-entry discipline (entry-point) --------------------------- */
@@ -126,7 +126,7 @@ module.exports = {
         // a deep import. (Same-package relative imports resolve within the
         // consumer's own `src` and are unaffected — they never hit `dist`.)
         path:
-          "^(packages/(protocol|colab_ui|colab_server)/dist/|@colab/(protocol|ui|server)/(src|dist)/)",
+          "^(packages/(protocol|colab_ui|colab_server)/dist/|colab-(protocol|ui|server)/(src|dist)/)",
         pathNot: PUBLIC_ENTRY,
       },
     },

@@ -4,13 +4,13 @@ import { defineConfig } from "vitest/config";
 const r = (p: string): string => fileURLToPath(new URL(p, import.meta.url));
 
 /**
- * Resolve `@colab/*` specifiers to package SOURCE in tests, so `pnpm test`
+ * Resolve `colab-*` specifiers to package SOURCE in tests, so `pnpm test`
  * runs without a prior build and always exercises current source.
  */
 const colabAliases = {
-  "@colab/protocol": r("./packages/protocol/src/index.ts"),
-  "@colab/ui": r("./packages/colab_ui/src/index.ts"),
-  "@colab/server": r("./packages/colab_server/src/index.ts"),
+  "colab-protocol": r("./packages/protocol/src/index.ts"),
+  "colab-ui": r("./packages/colab_ui/src/index.ts"),
+  "colab-server": r("./packages/colab_server/src/index.ts"),
 };
 
 /**
