@@ -21,3 +21,5 @@ export type {
   MessageHandler,
   BusErrorReporter,
 } from "./core/index.js";
+export { createRoster } from "./core/index.js";
+export type { Roster } from "./core/index.js";

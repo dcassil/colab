@@ -6,3 +6,6 @@
  */
 export { createMessageBus } from "./bus.js";
 export type { MessageBus, MessageHandler, BusErrorReporter } from "./bus.js";
+
+export { createRoster } from "./roster.js";
+export type { Roster } from "./roster.js";
