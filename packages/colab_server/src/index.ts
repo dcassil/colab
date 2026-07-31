@@ -1,13 +1,9 @@
-/**
- * colab-server — public entry (skeleton).
- *
- * Generic, interaction-agnostic relay lands in initiative I6.
- * May import `colab-protocol`; must never import `colab-ui`.
- */
-import { COLAB_EVENTS } from "colab-protocol";
-
-/** Package name marker, replaced by real relay exports downstream. */
-export const COLAB_SERVER_PACKAGE = "colab-server" as const;
-
-/** Proves the protocol project reference resolves at build time. */
-export const PROTOCOL_LINK = COLAB_EVENTS.JOIN;
+export {
+  CLIENT_MESSAGE_EVENTS,
+  isRelayMessage,
+  toServerRelayEvent,
+  type ClientMessage,
+  type ClientMessageEvent,
+  type RelayClientEvent,
+  type RelayMessage,
+} from "./protocol-adapter.js";
