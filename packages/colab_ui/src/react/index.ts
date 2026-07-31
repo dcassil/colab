@@ -13,6 +13,11 @@
 export { ColabProvider } from "./ColabProvider.js";
 export { useColab } from "./useColab.js";
 export { usePresence } from "./usePresence.js";
+export { useInteraction } from "./useInteraction.js";
+export type {
+  InteractionActions,
+  UseInteractionResult,
+} from "./useInteraction.js";
 export { ColabProviderMissingError } from "./useColabContext.js";
 
 export type {

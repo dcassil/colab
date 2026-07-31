@@ -19,6 +19,7 @@ import type { Identity } from "colab-protocol";
 
 import type { ColabStore } from "../contracts/store.js";
 import type { Session } from "../core/session.js";
+import { mirrorInteractions } from "./interactionMirror.js";
 import { ROSTER_KEY } from "./storeKeys.js";
 import type { GetToken } from "./types.js";
 
@@ -57,12 +58,14 @@ export function startSession(input: StartSessionInput): () => void {
   // analysis, since the reassignment happens in a different function scope).
   const state = { stopped: false };
 
-  const unmirror = mirrorRoster(session, store);
+  const unmirrorRoster = mirrorRoster(session, store);
+  const unmirrorInteractions = mirrorInteractions(session, store);
 
   function stop(): void {
     if (state.stopped) return;
     state.stopped = true;
-    unmirror();
+    unmirrorInteractions();
+    unmirrorRoster();
     void session.disconnect();
   }
 
