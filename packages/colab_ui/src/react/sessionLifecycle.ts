@@ -17,15 +17,33 @@
  */
 import type { Identity } from "colab-protocol";
 
+import type { ColabStore } from "../contracts/store.js";
 import type { Session } from "../core/session.js";
+import { ROSTER_KEY } from "./storeKeys.js";
 import type { GetToken } from "./types.js";
 
 /** Inputs describing how to start one session lifecycle. */
 export interface StartSessionInput {
   session: Session;
+  store: ColabStore;
   room: string;
   identity: Identity;
   getToken?: GetToken;
+}
+
+/**
+ * Mirror `session.roster` into the store under {@link ROSTER_KEY} so roster
+ * reads ride the same `useColabStore` primitive as everything else. Primes the
+ * key once, then re-writes the snapshot on every roster change; the store's
+ * change-gate + the roster's change-only notifications keep this tight.
+ * Returns an unsubscribe closure.
+ */
+function mirrorRoster(session: Session, store: ColabStore): () => void {
+  const write = (): void => {
+    store.set(ROSTER_KEY, session.roster.getParticipants());
+  };
+  write();
+  return session.roster.subscribe(write);
 }
 
 /**
@@ -33,15 +51,18 @@ export interface StartSessionInput {
  * Returns a synchronous, idempotent `stop` closure for the effect cleanup.
  */
 export function startSession(input: StartSessionInput): () => void {
-  const { session, room, identity, getToken } = input;
+  const { session, store, room, identity, getToken } = input;
   // Boxed in an object so `stop()` mutating it is visible to the async join
   // closure (a plain `let` would be narrowed to its initializer by control-flow
   // analysis, since the reassignment happens in a different function scope).
   const state = { stopped: false };
 
+  const unmirror = mirrorRoster(session, store);
+
   function stop(): void {
     if (state.stopped) return;
     state.stopped = true;
+    unmirror();
     void session.disconnect();
   }
 

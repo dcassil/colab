@@ -12,6 +12,7 @@
  */
 export { ColabProvider } from "./ColabProvider.js";
 export { useColab } from "./useColab.js";
+export { usePresence } from "./usePresence.js";
 export { ColabProviderMissingError } from "./useColabContext.js";
 
 export type {

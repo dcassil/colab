@@ -56,11 +56,19 @@ export function ColabProvider(props: ColabProviderProps): React.ReactElement {
   }, [serverUrl, room, identity, transport, store, interactions, getToken]);
 
   const session = value.session;
+  const resolvedStore = value.store;
 
   // LIFECYCLE — effect-driven, paired, Strict-Mode-safe.
   useEffect(
-    () => startSession({ session, room, identity, ...(getToken !== undefined ? { getToken } : {}) }),
-    [session, room, identity, getToken],
+    () =>
+      startSession({
+        session,
+        store: resolvedStore,
+        room,
+        identity,
+        ...(getToken !== undefined ? { getToken } : {}),
+      }),
+    [session, resolvedStore, room, identity, getToken],
   );
 
   return <ColabContext.Provider value={value}>{children}</ColabContext.Provider>;
