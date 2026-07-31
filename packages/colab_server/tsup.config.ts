@@ -7,5 +7,6 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   external: ["colab-protocol", "socket.io"],
-  tsconfig: "tsconfig.build.json",
+  // Non-composite tsconfig for tsup's dts step (see protocol/tsup.config.ts).
+  tsconfig: "tsconfig.dts.json",
 });

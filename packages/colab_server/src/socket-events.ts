@@ -1,6 +1,8 @@
 import type { ColabMessage } from "colab-protocol";
 import { COLAB_EVENTS, COLAB_SERVER_EVENTS } from "colab-protocol";
 
+import type { JoinRequest } from "./handshake.js";
+
 export interface ClientToServerEvents {
   [COLAB_EVENTS.POINTER]: (
     message: ColabMessage<typeof COLAB_EVENTS.POINTER>,
@@ -37,4 +39,8 @@ export interface ServerToClientEvents {
 
 export interface InterServerEvents {
   ping: () => void;
+}
+
+export interface SocketData {
+  joinRequest?: JoinRequest;
 }

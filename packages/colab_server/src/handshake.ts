@@ -1,4 +1,5 @@
 import type { Identity } from "colab-protocol";
+import type { JsonValue } from "colab-protocol";
 
 export interface JoinRequest {
   roomId: string;
@@ -37,7 +38,7 @@ function readIdentity(value: unknown): Identity | undefined {
     return undefined;
   }
 
-  return isRecord(value.extra)
+  return isJsonObject(value.extra)
     ? { id, name, color, extra: value.extra }
     : { id, name, color };
 }
@@ -48,4 +49,29 @@ function readString(value: unknown): string | undefined {
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isJsonObject(value: unknown): value is Record<string, JsonValue> {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return Object.values(value).every(isJsonValue);
+}
+
+function isJsonValue(value: unknown): value is JsonValue {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return true;
+  }
+
+  if (Array.isArray(value)) {
+    return value.every(isJsonValue);
+  }
+
+  return isJsonObject(value);
 }

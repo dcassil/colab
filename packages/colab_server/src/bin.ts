@@ -6,8 +6,8 @@ const DEFAULT_PORT = 3001;
 try {
   const options = readOptions();
   const server = createColabServer(options);
-  const port = await server.listen(options.port);
-  process.stdout.write(`colab-server listening on ${String(port)}\n`);
+  const port = await server.listen(options.port, options.host);
+  process.stdout.write(`colab-server listening on ${listenUrl(options.host, port)}\n`);
 } catch (error) {
   const message = error instanceof Error ? error.message : "Unknown startup error";
   process.stderr.write(`colab-server failed to start: ${message}\n`);
@@ -15,19 +15,20 @@ try {
 }
 
 function readOptions(): CreateColabServerOptions {
+  const host = process.env.COLAB_SERVER_HOST;
   const port = readPort(process.env.COLAB_SERVER_PORT);
 
   if (process.env.COLAB_SERVER_DEMO_ALLOW_ANY_ORIGIN === "true") {
-    return { demoAllowAnyOrigin: true, port };
+    return withHost({ demoAllowAnyOrigin: true, port }, host);
   }
 
   const origin = readOrigin(process.env.COLAB_SERVER_CORS_ORIGINS);
 
   if (origin === undefined) {
-    return { port };
+    return withHost({ port }, host);
   }
 
-  return { cors: { origin }, port };
+  return withHost({ cors: { origin }, port }, host);
 }
 
 function readPort(value: string | undefined): number {
@@ -60,4 +61,15 @@ function readOrigin(value: string | undefined): string | string[] | undefined {
 
   const first = origins[0];
   return origins.length === 1 && first !== undefined ? first : origins;
+}
+
+function withHost(
+  options: CreateColabServerOptions,
+  host: string | undefined,
+): CreateColabServerOptions {
+  return host === undefined || host.length === 0 ? options : { ...options, host };
+}
+
+function listenUrl(host: string | undefined, port: number): string {
+  return `http://${host ?? "0.0.0.0"}:${String(port)}`;
 }

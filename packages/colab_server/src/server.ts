@@ -9,6 +9,7 @@ import type {
   ClientToServerEvents,
   InterServerEvents,
   ServerToClientEvents,
+  SocketData,
 } from "./socket-events.js";
 
 export interface CorsConfig {
@@ -18,6 +19,7 @@ export interface CorsConfig {
 export interface CreateColabServerOptions extends RelayOptions {
   cors?: CorsConfig;
   demoAllowAnyOrigin?: boolean;
+  host?: string;
   httpServer?: HttpServer;
   port?: number;
   socketOptions?: Partial<Omit<ServerOptions, "cors">>;
@@ -26,22 +28,26 @@ export interface CreateColabServerOptions extends RelayOptions {
 export type ColabSocketServer = SocketServer<
   ClientToServerEvents,
   ServerToClientEvents,
-  InterServerEvents
+  InterServerEvents,
+  SocketData
 >;
 
 export interface ColabServer {
   httpServer: HttpServer;
   io: ColabSocketServer;
   close: () => Promise<void>;
-  listen: (port?: number) => Promise<number>;
+  listen: (port?: number, host?: string) => Promise<number>;
 }
+
+type ResolvedCors = NonNullable<ServerOptions["cors"]>;
 
 export function createColabServer(options: CreateColabServerOptions): ColabServer {
   const httpServer = options.httpServer ?? createHttpServer();
   const io = new SocketServer<
     ClientToServerEvents,
     ServerToClientEvents,
-    InterServerEvents
+    InterServerEvents,
+    SocketData
   >(httpServer, {
     ...options.socketOptions,
     cors: resolveCors(options),
@@ -53,11 +59,12 @@ export function createColabServer(options: CreateColabServerOptions): ColabServe
     httpServer,
     io,
     close: () => closeServer(io, httpServer),
-    listen: (port = options.port ?? 0) => listen(httpServer, port),
+    listen: (port = options.port ?? 0, host = options.host) =>
+      listen(httpServer, port, host),
   };
 }
 
-function resolveCors(options: CreateColabServerOptions): ServerOptions["cors"] {
+function resolveCors(options: CreateColabServerOptions): ResolvedCors {
   if (options.demoAllowAnyOrigin === true) {
     return { origin: "*" };
   }
@@ -69,17 +76,28 @@ function resolveCors(options: CreateColabServerOptions): ServerOptions["cors"] {
   return { origin: options.cors.origin };
 }
 
-async function listen(httpServer: HttpServer, port: number): Promise<number> {
+async function listen(
+  httpServer: HttpServer,
+  port: number,
+  host: string | undefined,
+): Promise<number> {
   await new Promise<void>((resolve, reject) => {
     const onError = (error: Error): void => {
       reject(error);
     };
 
     httpServer.once("error", onError);
-    httpServer.listen(port, () => {
+    const onListening = (): void => {
       httpServer.off("error", onError);
       resolve();
-    });
+    };
+
+    if (host === undefined) {
+      httpServer.listen(port, onListening);
+      return;
+    }
+
+    httpServer.listen(port, host, onListening);
   });
 
   return readPort(httpServer);
@@ -90,7 +108,7 @@ async function closeServer(
   httpServer: HttpServer,
 ): Promise<void> {
   await new Promise<void>((resolve) => {
-    io.close(() => {
+    void io.close(() => {
       resolve();
     });
   });

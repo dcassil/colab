@@ -1,3 +1,5 @@
+import { createServer as createHttpServer } from "node:http";
+
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -16,18 +18,15 @@ import type {
 } from "./socket-events.js";
 
 type TestClient = ClientSocket<ServerToClientEvents, ClientToServerEvents>;
-type ServerEvent = keyof ServerToClientEvents;
-type ServerMessage<T extends ServerEvent> = ServerToClientEvents[T] extends (
-  message: infer Message,
-) => void
-  ? Message
-  : never;
 
 const alice: Identity = { id: "alice", name: "Alice", color: "#c00" };
 const bob: Identity = { id: "bob", name: "Bob", color: "#00c" };
 
 let server: ColabServer | undefined;
 const clients: TestClient[] = [];
+const describeWhenListeningWorks = (await canListenOnLoopback())
+  ? describe
+  : describe.skip;
 
 afterEach(async () => {
   for (const client of clients.splice(0)) {
@@ -38,21 +37,21 @@ afterEach(async () => {
   server = undefined;
 });
 
-describe("Socket.IO relay integration", () => {
+describeWhenListeningWorks("Socket.IO relay integration", () => {
   it("fans out to peers, sends roster, and emits leave on disconnect", async () => {
     server = createColabServer({ cors: { origin: "http://localhost" } });
-    const url = `http://localhost:${String(await server.listen())}`;
+    const url = `http://127.0.0.1:${String(await server.listen(0, "127.0.0.1"))}`;
 
     const first = connectClient(url, "room-a", alice);
-    const firstRoster = waitForEvent(first, COLAB_SERVER_EVENTS.ROSTER);
+    const firstRoster = waitForRoster(first);
     await waitForConnect(first);
     expect(await firstRoster).toMatchObject({
       payload: { participants: [alice] },
     });
 
-    const joined = waitForEvent(first, COLAB_SERVER_EVENTS.PARTICIPANT_JOINED);
+    const joined = waitForParticipantJoined(first);
     const second = connectClient(url, "room-a", bob);
-    const secondRoster = waitForEvent(second, COLAB_SERVER_EVENTS.ROSTER);
+    const secondRoster = waitForRoster(second);
     await waitForConnect(second);
     expect(await joined).toMatchObject({ payload: bob });
     expect((await secondRoster).payload.participants).toHaveLength(2);
@@ -60,7 +59,7 @@ describe("Socket.IO relay integration", () => {
     const echoes: ColabMessage<typeof COLAB_SERVER_EVENTS.POINTER>[] = [];
     first.on(COLAB_SERVER_EVENTS.POINTER, (message) => echoes.push(message));
 
-    const relayed = waitForEvent(second, COLAB_SERVER_EVENTS.POINTER);
+    const relayed = waitForPointer(second);
     first.emit(
       COLAB_EVENTS.POINTER,
       createMessage(COLAB_EVENTS.POINTER, alice.id, { x: 0.25, y: 0.75 }),
@@ -73,7 +72,7 @@ describe("Socket.IO relay integration", () => {
     await delay(30);
     expect(echoes).toEqual([]);
 
-    const left = waitForEvent(first, COLAB_SERVER_EVENTS.PARTICIPANT_LEFT);
+    const left = waitForParticipantLeft(first);
     second.disconnect();
     expect(await left).toMatchObject({ payload: { id: bob.id } });
   });
@@ -107,12 +106,41 @@ async function waitForConnect(client: TestClient | undefined): Promise<void> {
   });
 }
 
-function waitForEvent<T extends ServerEvent>(
+function waitForRoster(
   client: TestClient,
-  event: T,
-): Promise<ServerMessage<T>> {
+): Promise<ColabMessage<typeof COLAB_SERVER_EVENTS.ROSTER>> {
   return new Promise((resolve) => {
-    client.once(event, (message) => {
+    client.once(COLAB_SERVER_EVENTS.ROSTER, (message) => {
+      resolve(message);
+    });
+  });
+}
+
+function waitForParticipantJoined(
+  client: TestClient,
+): Promise<ColabMessage<typeof COLAB_SERVER_EVENTS.PARTICIPANT_JOINED>> {
+  return new Promise((resolve) => {
+    client.once(COLAB_SERVER_EVENTS.PARTICIPANT_JOINED, (message) => {
+      resolve(message);
+    });
+  });
+}
+
+function waitForPointer(
+  client: TestClient,
+): Promise<ColabMessage<typeof COLAB_SERVER_EVENTS.POINTER>> {
+  return new Promise((resolve) => {
+    client.once(COLAB_SERVER_EVENTS.POINTER, (message) => {
+      resolve(message);
+    });
+  });
+}
+
+function waitForParticipantLeft(
+  client: TestClient,
+): Promise<ColabMessage<typeof COLAB_SERVER_EVENTS.PARTICIPANT_LEFT>> {
+  return new Promise((resolve) => {
+    client.once(COLAB_SERVER_EVENTS.PARTICIPANT_LEFT, (message) => {
       resolve(message);
     });
   });
@@ -121,5 +149,20 @@ function waitForEvent<T extends ServerEvent>(
 async function delay(milliseconds: number): Promise<void> {
   await new Promise<void>((resolve) => {
     setTimeout(resolve, milliseconds);
+  });
+}
+
+async function canListenOnLoopback(): Promise<boolean> {
+  const probe = createHttpServer();
+
+  return await new Promise<boolean>((resolve) => {
+    probe.once("error", () => {
+      resolve(false);
+    });
+    probe.listen(0, "127.0.0.1", () => {
+      probe.close(() => {
+        resolve(true);
+      });
+    });
   });
 }
