@@ -35,8 +35,10 @@ export function ColabProvider(props: ColabProviderProps): React.ReactElement {
     children,
   } = props;
 
-  // ASSEMBLY — pure construction, memoized on the identity-defining inputs.
-  const session = useMemo(() => {
+  // ASSEMBLY — pure construction, memoized on the identity-defining inputs. The
+  // session and the store it writes through are captured together so the
+  // context value below stays a single stable reference per session.
+  const value = useMemo<ColabContextValue>(() => {
     const config = resolveSessionConfig({
       serverUrl,
       room,
@@ -46,21 +48,20 @@ export function ColabProvider(props: ColabProviderProps): React.ReactElement {
       ...(interactions !== undefined ? { interactions } : {}),
       ...(getToken !== undefined ? { getToken } : {}),
     });
-    const created = createSession(config.deps);
+    const session = createSession(config.deps);
     for (const interaction of config.interactions) {
-      created.registry.register(interaction);
+      session.registry.register(interaction);
     }
-    return created;
+    return { session, store: config.deps.store };
   }, [serverUrl, room, identity, transport, store, interactions, getToken]);
+
+  const session = value.session;
 
   // LIFECYCLE — effect-driven, paired, Strict-Mode-safe.
   useEffect(
     () => startSession({ session, room, identity, ...(getToken !== undefined ? { getToken } : {}) }),
     [session, room, identity, getToken],
   );
-
-  // CONTEXT — stable value; changes only when the session changes.
-  const value = useMemo<ColabContextValue>(() => ({ session }), [session]);
 
   return <ColabContext.Provider value={value}>{children}</ColabContext.Provider>;
 }

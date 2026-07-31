@@ -45,8 +45,19 @@ export interface ColabProviderProps {
   children?: ReactNode;
 }
 
-/** The value carried on {@link ColabContext}: only the live session handle. */
+/**
+ * The value carried on {@link ColabContext}.
+ *
+ * Primarily the live I2 {@link Session} handle (roster + registry + lifecycle).
+ * The I2 `Session` intentionally does NOT surface its injected store (the store
+ * is a seam the session writes through, not part of its public shape), so the
+ * provider — which owns the resolved store — also carries it here for the read
+ * hooks to subscribe to. Everything else the hooks need (roster, registry) is
+ * read from `session`, keeping this surface minimal and stable.
+ */
 export interface ColabContextValue {
   /** The I2 session assembled and owned by `<ColabProvider>`. */
   session: Session;
+  /** The resolved {@link ColabStore} the session writes through. */
+  store: ColabStore;
 }
