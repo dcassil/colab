@@ -15,7 +15,8 @@
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "typecheck": "tsc -b"
   },
   "devDependencies": {
     "tsup": "^8.5.0",
