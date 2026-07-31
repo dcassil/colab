@@ -11,6 +11,8 @@
  * additions below land as their tasks complete.
  */
 export { ColabProvider } from "./ColabProvider.js";
+export { useColab } from "./useColab.js";
+export { ColabProviderMissingError } from "./useColabContext.js";
 
 export type {
   ColabProviderProps,
