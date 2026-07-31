@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    // Ship node-/DOM-free declarations: the built output must not depend on
+    // ambient `@types/node` globals (that package is a devDependency used only
+    // by file-scanning TESTS, whose tsconfig opts `node` in explicitly).
+    "types": []
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.test.ts"],

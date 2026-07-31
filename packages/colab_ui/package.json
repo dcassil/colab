@@ -21,7 +21,19 @@
   "dependencies": {
     "colab-protocol": "workspace:*"
   },
+  "peerDependencies": {
+    "socket.io-client": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "socket.io-client": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {
+    "socket.io-client": "^4.0.0"
+  },
   "devDependencies": {
+    "socket.io-client": "^4.8.1",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3"
   }

@@ -51,9 +51,29 @@ export default defineConfig({
     ],
     coverage: {
       provider: "v8",
-      // Thresholds intentionally left unset — the skeletons have no real logic
-      // to cover yet. Downstream initiatives set thresholds when code lands.
       reportsDirectory: "./coverage",
+      // I3 (PROJ-I-0003) enforces the 90%+ target on its three seam-default
+      // modules: store, transport, and identity. Coverage is scoped to those
+      // implementation files; re-export barrels (`index.ts`), the reusable
+      // contract-suite harnesses (exercised via wrappers), tests, and unrelated
+      // packages are excluded so the gate measures real seam logic.
+      include: [
+        "packages/colab_ui/src/store/**/*.ts",
+        "packages/colab_ui/src/transport/**/*.ts",
+        "packages/colab_ui/src/identity/**/*.ts",
+      ],
+      exclude: [
+        "**/index.ts",
+        "**/*.test.ts",
+        "**/storeContract.ts",
+        "**/transportContract.ts",
+      ],
+      thresholds: {
+        statements: 90,
+        branches: 90,
+        functions: 90,
+        lines: 90,
+      },
     },
   },
 });
