@@ -84,4 +84,23 @@ describe("MessageBus error isolation (AC)", () => {
     expect(survivor).toHaveBeenCalledTimes(1);
     expect(onError).toHaveBeenCalledTimes(1);
   });
+
+  it("the default reporter logs to the host console when present", () => {
+    const host = globalThis as unknown as {
+      console: { error: (...args: unknown[]) => void };
+    };
+    const original = host.console;
+    const errorSpy = vi.fn();
+    host.console = { error: errorSpy };
+    try {
+      const bus = createMessageBus();
+      bus.subscribe(COLAB_EVENTS.POINTER, () => {
+        throw new Error("boom");
+      });
+      bus.publish(pointer(1));
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      host.console = original;
+    }
+  });
 });
