@@ -34,6 +34,12 @@ export type { InteractionRegistry } from "./core/index.js";
 export { createSession } from "./core/index.js";
 export type { Session, SessionDeps } from "./core/index.js";
 
+export { defineInteraction } from "./interaction/index.js";
+export type {
+  InteractionDescriptor,
+  InteractionSelectors,
+} from "./interaction/index.js";
+
 export { createInMemoryStore } from "./store/index.js";
 
 export {
