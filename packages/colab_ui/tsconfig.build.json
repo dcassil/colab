@@ -3,12 +3,15 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    // Ship node-/DOM-free declarations: the built output must not depend on
-    // ambient `@types/node` globals (that package is a devDependency used only
-    // by file-scanning TESTS, whose tsconfig opts `node` in explicitly).
+    // JSX transform + DOM lib are required by the React binding (src/react/**)
+    // and its peer `react`/`react-dom` type surface. `@types/node` is still
+    // kept OUT (`types: []`) so the core declarations carry no node ambient
+    // globals; DOM/react types enter only through explicit `import`s.
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": []
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.test.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
   "references": [{ "path": "../protocol/tsconfig.build.json" }]
 }

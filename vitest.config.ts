@@ -37,7 +37,11 @@ export default defineConfig({
         test: {
           name: "colab_ui",
           root: "./packages/colab_ui",
-          include: ["src/**/*.test.ts"],
+          include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+          // The React binding (src/react/**) needs a DOM; the framework-free
+          // core keeps running under plain node for speed and to prove its
+          // DOM-freedom. Per-file environment selection gives both.
+          environmentMatchGlobs: [["src/react/**", "jsdom"]],
         },
       },
       {

@@ -11,6 +11,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": ["dist"],
@@ -22,9 +26,17 @@
     "colab-protocol": "workspace:*"
   },
   "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
     "socket.io-client": "^4.0.0"
   },
   "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
     "socket.io-client": {
       "optional": true
     }
@@ -33,6 +45,11 @@
     "socket.io-client": "^4.0.0"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "socket.io-client": "^4.8.1",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3"

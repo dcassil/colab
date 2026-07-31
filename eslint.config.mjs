@@ -22,6 +22,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import eslintComments from "@eslint-community/eslint-plugin-eslint-comments";
 import boundaries from "eslint-plugin-boundaries";
+import reactHooks from "eslint-plugin-react-hooks";
 
 export default tseslint.config(
   {
@@ -110,6 +111,23 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // REACT BINDING (I4) — react-hooks correctness rules on the React subpath.
+  //
+  // The React binding is scrutinized for hook correctness (rules-of-hooks +
+  // exhaustive-deps). These rules are scoped to `src/react/**` so the
+  // framework-free core is unaffected. This ADDS strictness — it never relaxes
+  // any existing rule.
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    files: ["packages/*/src/react/**/*.{ts,tsx}"],
+    plugins: { "react-hooks": reactHooks },
+    rules: {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "error",
     },
   },
 
