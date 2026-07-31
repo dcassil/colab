@@ -7,6 +7,7 @@ import type { Identity } from "colab-protocol";
 import { createFakeStore, createFakeTransport } from "../__tests__/fakes.js";
 import { ColabProvider } from "./ColabProvider.js";
 import { useColab } from "./useColab.js";
+import { ColabProviderMissingError } from "./useColabContext.js";
 import type { Session } from "../core/session.js";
 
 const identity: Identity = { id: "me", name: "Me", color: "#fff" };
@@ -20,6 +21,7 @@ describe("useColab outside provider (TC-001)", () => {
     // Silence React's error boundary logging for the expected throw.
     const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
     expect(() => render(<Bare />)).toThrow(/<ColabProvider>/);
+    expect(() => render(<Bare />)).toThrow(ColabProviderMissingError);
     spy.mockRestore();
   });
 });

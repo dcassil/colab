@@ -62,12 +62,13 @@ describe("ColabProvider lifecycle (TC-001)", () => {
     expect(transport.hasSubscriber()).toBe(false);
   });
 
-  it("provides a { session } context value", () => {
+  it("provides a { session, store } context value", () => {
     const transport = createFakeTransport();
     const view = renderProvider(transport);
     const ctx = view.ctx();
     expect(ctx).not.toBeNull();
     expect(ctx?.session).toBeDefined();
+    expect(ctx?.store).toBeDefined();
     view.unmount();
   });
 });
@@ -119,4 +120,5 @@ describe("ColabProvider dependency change (TC-003)", () => {
     expect(transport.connectCalls()).toBe(1);
     view.unmount();
   });
+
 });
