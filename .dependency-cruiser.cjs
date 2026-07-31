@@ -175,7 +175,10 @@ module.exports = {
           "(^|/)src/index\\.[tj]s$",
           // Built barrels are the resolved cross-package entry, reached via a
           // package specifier (not a crawlable local edge) — not dead code.
+          // Includes subpath entries (e.g. `dist/react/index.js`, the
+          // `colab-ui/react` export barrel).
           "(^|/)dist/index\\.(js|d\\.ts)$",
+          "(^|/)dist/[^/]+/index\\.(js|d\\.ts)$",
           "\\.(test|spec)\\.[tj]sx?$",
         ],
       },
