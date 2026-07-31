@@ -16,11 +16,14 @@
  */
 import { useEffect, useMemo } from "react";
 
+import { identity as identityTransform } from "../coordinate/types.js";
 import { createSession } from "../core/session.js";
 import { ColabContext } from "./context.js";
 import { resolveSessionConfig } from "./resolveSessionConfig.js";
 import { startSession } from "./sessionLifecycle.js";
 import type { ColabContextValue, ColabProviderProps } from "./types.js";
+
+type SessionContextValue = Pick<ColabContextValue, "session" | "store">;
 
 /** The provider component. See the module doc for the lifecycle contract. */
 export function ColabProvider(props: ColabProviderProps): React.ReactElement {
@@ -32,13 +35,14 @@ export function ColabProvider(props: ColabProviderProps): React.ReactElement {
     store,
     interactions,
     getToken,
+    transform,
     children,
   } = props;
 
   // ASSEMBLY — pure construction, memoized on the identity-defining inputs. The
   // session and the store it writes through are captured together so the
   // context value below stays a single stable reference per session.
-  const value = useMemo<ColabContextValue>(() => {
+  const sessionValue = useMemo<SessionContextValue>(() => {
     const config = resolveSessionConfig({
       serverUrl,
       room,
@@ -55,8 +59,16 @@ export function ColabProvider(props: ColabProviderProps): React.ReactElement {
     return { session, store: config.deps.store };
   }, [serverUrl, room, identity, transport, store, interactions, getToken]);
 
-  const session = value.session;
-  const resolvedStore = value.store;
+  const value = useMemo<ColabContextValue>(
+    () => ({
+      ...sessionValue,
+      transform: transform ?? identityTransform,
+    }),
+    [sessionValue, transform],
+  );
+
+  const session = sessionValue.session;
+  const resolvedStore = sessionValue.store;
 
   // LIFECYCLE — effect-driven, paired, Strict-Mode-safe.
   useEffect(

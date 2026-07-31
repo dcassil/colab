@@ -66,3 +66,18 @@ export type {
   IdentityInput,
   IdentityProvider,
 } from "./identity/index.js";
+
+export {
+  ColabStage,
+  ColabStageContext,
+  identity,
+  useColabStage,
+} from "./coordinate/index.js";
+export type {
+  ColabStageContextValue,
+  Point,
+  PointerSampleListener,
+  PointerSampleSource,
+  StageBox,
+  Transform,
+} from "./coordinate/index.js";

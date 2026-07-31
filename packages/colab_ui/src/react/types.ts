@@ -13,6 +13,7 @@ import type { Identity } from "colab-protocol";
 import type { Interaction } from "../contracts/interaction.js";
 import type { ColabStore } from "../contracts/store.js";
 import type { ColabTransport } from "../contracts/transport.js";
+import type { Transform } from "../coordinate/types.js";
 import type { Session } from "../core/session.js";
 
 /** How the identity path obtains a (possibly refreshed) auth token. */
@@ -41,6 +42,8 @@ export interface ColabProviderProps {
   interactions?: readonly Interaction[];
   /** Async/sync token-getter threaded into the default transport's handshake. */
   getToken?: GetToken;
+  /** Render-only normalized-point transform seam, defaulting to identity. */
+  transform?: Transform;
   /** The subtree that reads the session via the hooks. */
   children?: ReactNode;
 }
@@ -60,4 +63,6 @@ export interface ColabContextValue {
   session: Session;
   /** The resolved {@link ColabStore} the session writes through. */
   store: ColabStore;
+  /** Render-only normalized-point transform seam. */
+  transform: Transform;
 }

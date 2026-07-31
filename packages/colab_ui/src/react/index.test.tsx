@@ -6,8 +6,12 @@ import type { Identity } from "colab-protocol";
 import * as reactEntry from "./index.js";
 import { createFakeStore, createFakeTransport } from "../__tests__/fakes.js";
 import {
+  ColabStage,
+  ColabStageContext,
   ColabProvider,
+  identity as identityTransform,
   useColab,
+  useColabStage,
   useInteraction,
   usePresence,
 } from "./index.js";
@@ -17,7 +21,10 @@ import type {
   ColabTransport,
   Interaction,
   Participant,
+  Point,
   Session,
+  StageBox,
+  Transform,
 } from "./index.js";
 
 describe("React entry public surface (TC-001)", () => {
@@ -25,9 +32,13 @@ describe("React entry public surface (TC-001)", () => {
     const keys = Object.keys(reactEntry).sort();
     expect(keys).toEqual(
       [
+        "ColabStage",
+        "ColabStageContext",
         "ColabProvider",
         "ColabProviderMissingError",
+        "identity",
         "useColab",
+        "useColabStage",
         "useInteraction",
         "usePresence",
       ].sort(),
@@ -88,6 +99,14 @@ describe("React entry happy path (TC-002)", () => {
       </ColabProvider>,
     );
     view.unmount();
+    const point: Point = { x: 0.5, y: 0.25 };
+    const box: StageBox = { left: 0, top: 0, width: 100, height: 50 };
+    const transform: Transform = identityTransform;
+    void ColabStage;
+    void ColabStageContext;
+    void useColabStage;
+    void box;
+    expect(transform(point)).toBe(point);
     expect(true).toBe(true);
   });
 });
