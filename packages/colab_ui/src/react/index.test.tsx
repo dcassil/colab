@@ -75,9 +75,9 @@ describe("React entry happy path (TC-002)", () => {
       }),
     };
     function Lock(): null {
-      const { state, actions } = useInteraction(lock);
+      const { state, send } = useInteraction(lock);
       void state;
-      void actions;
+      void send;
       return null;
     }
 

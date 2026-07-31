@@ -1,5 +1,5 @@
 import { act, render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { COLAB_SERVER_EVENTS, createMessage } from "colab-protocol";
 import type { Identity, Participant } from "colab-protocol";
@@ -9,6 +9,7 @@ import type { FakeTransport } from "../__tests__/fakes.js";
 import type { ColabStore } from "../contracts/store.js";
 import { ColabProvider } from "./ColabProvider.js";
 import { interactionKey } from "./storeKeys.js";
+import { ColabProviderMissingError } from "./useColabContext.js";
 import { usePresence } from "./usePresence.js";
 
 const identity: Identity = { id: "me", name: "Me", color: "#fff" };
@@ -49,6 +50,18 @@ function emitJoin(t: FakeTransport, p: Participant): void {
     t.emit(createMessage(COLAB_SERVER_EVENTS.PARTICIPANT_JOINED, p.id, p));
   });
 }
+
+describe("usePresence outside provider (TC-000)", () => {
+  it("throws the shared named provider error", () => {
+    function Bare(): null {
+      usePresence();
+      return null;
+    }
+    const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    expect(() => render(<Bare />)).toThrow(ColabProviderMissingError);
+    spy.mockRestore();
+  });
+});
 
 describe("usePresence excludes local (TC-001)", () => {
   it("returns exactly the remotes; local identity absent", () => {

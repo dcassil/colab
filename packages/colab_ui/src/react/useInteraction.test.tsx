@@ -1,7 +1,7 @@
 import { act, render } from "@testing-library/react";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
-import { COLAB_EVENTS, asScopeId } from "colab-protocol";
+import { COLAB_EVENTS, COLAB_SERVER_EVENTS, asScopeId } from "colab-protocol";
 import type { ColabMessage, Identity } from "colab-protocol";
 
 import { createFakeStore, createFakeTransport } from "../__tests__/fakes.js";
@@ -9,8 +9,9 @@ import type { FakeTransport } from "../__tests__/fakes.js";
 import type { ColabStore } from "../contracts/store.js";
 import type { Interaction } from "../contracts/interaction.js";
 import { ColabProvider } from "./ColabProvider.js";
+import { ColabProviderMissingError } from "./useColabContext.js";
 import { useInteraction } from "./useInteraction.js";
-import type { UseInteractionResult } from "./useInteraction.js";
+import type { InteractionActions, UseInteractionResult } from "./useInteraction.js";
 
 const identity: Identity = { id: "me", name: "Me", color: "#fff" };
 
@@ -97,8 +98,8 @@ function mount(
   }
 }
 
-describe("useInteraction typed state + actions (TC-001)", () => {
-  it("returns the reduced slice, updates on change, and dispatches actions", () => {
+describe("useInteraction typed state + send (TC-001)", () => {
+  it("returns the reduced slice, updates on change, and dispatches sends", () => {
     const lock = makeLock();
     const transport = createFakeTransport();
     const view = mount([lock], transport, createFakeStore(), lock);
@@ -106,7 +107,7 @@ describe("useInteraction typed state + actions (TC-001)", () => {
     // Drive a local action: it publishes toMessage(input) on the bus, the fold
     // reduces it into the slice, and the consumer re-renders with new state.
     act(() => {
-      view.result().actions.send({ locked: true });
+      view.result().send({ locked: true });
     });
     expect(view.result().state).toEqual({ locked: true });
     // The local interaction was relayed to the transport.
@@ -116,21 +117,33 @@ describe("useInteraction typed state + actions (TC-001)", () => {
     view.unmount();
   });
 
-  it("infers state and actions types from the descriptor", () => {
+  it("infers state and send types from the descriptor", () => {
     const lock = makeLock();
     const result: UseInteractionResult<LockState> = {
       state: { locked: true },
-      actions: { send: () => undefined },
+      send: () => undefined,
     };
+    const actions: InteractionActions = result;
     expectTypeOf(result.state).toEqualTypeOf<LockState | undefined>();
     expectTypeOf(useInteraction<LockState>).returns.toEqualTypeOf<
       UseInteractionResult<LockState>
     >();
+    expectTypeOf(actions.send).toEqualTypeOf<(input: unknown) => void>();
     void lock;
   });
 });
 
-describe("useInteraction unregistered throws (TC-002)", () => {
+describe("useInteraction misuse errors (TC-002)", () => {
+  it("throws the shared named provider error outside a provider", () => {
+    function Bare(): null {
+      useInteraction(makeLock());
+      return null;
+    }
+    const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    expect(() => render(<Bare />)).toThrow(ColabProviderMissingError);
+    spy.mockRestore();
+  });
+
   it("throws a named error when the interaction is not registered", () => {
     const lock = makeLock();
     const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
@@ -142,26 +155,35 @@ describe("useInteraction unregistered throws (TC-002)", () => {
   });
 });
 
-describe("useInteraction selective re-render + stable actions (TC-003)", () => {
-  it("ignores unrelated slices and keeps actions stable", () => {
+describe("useInteraction selective re-render + stable send (TC-003)", () => {
+  it("ignores unrelated slices and keeps send stable", () => {
     const lock = makeLock();
+    const other: Interaction<LockState> = { ...lock, type: "other" };
     const transport = createFakeTransport();
     const store = createFakeStore();
-    const view = mount([lock], transport, store, lock);
-    const firstActions = view.result().actions;
+    const view = mount([lock, other], transport, store, lock);
+    const firstSend = view.result().send;
     const before = view.renders();
 
-    // Update an UNRELATED store key: no re-render of this interaction consumer.
+    // Update interaction B through the real mirror path: A does not re-render.
     act(() => {
-      store.set("colab:interaction:other", { x: 1 });
+      transport.emit({
+        type: COLAB_SERVER_EVENTS.INTERACTION,
+        from: "peer",
+        payload: {
+          name: "other",
+          scopeId: asScopeId("field-2"),
+          data: { locked: true },
+        },
+      });
     });
     expect(view.renders()).toBe(before);
 
-    // A relevant change re-renders; actions identity stays stable throughout.
+    // A relevant change re-renders; send identity stays stable throughout.
     act(() => {
-      view.result().actions.send({ locked: true });
+      view.result().send({ locked: true });
     });
-    expect(view.result().actions).toBe(firstActions);
+    expect(view.result().send).toBe(firstSend);
     view.unmount();
   });
 });

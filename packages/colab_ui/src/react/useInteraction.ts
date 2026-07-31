@@ -1,11 +1,11 @@
 /**
- * `useInteraction` — typed `{ state, actions }` access to one interaction.
+ * `useInteraction` — typed `{ state, send }` access to one interaction.
  *
  * Generic over the I2 {@link Interaction} descriptor passed in, so `state` is
  * inferred as the descriptor's own state type `S` (no call-site annotation
  * needed). `state` is the interaction's current reduced slice, read through the
  * shared {@link useColabStore} primitive scoped to that interaction's store key,
- * so unrelated slice updates never re-render the consumer. `actions` is the
+ * so unrelated slice updates never re-render the consumer. `send` is the
  * minimal, honest surface the descriptor supports — `send(input)` maps a local
  * input via the descriptor's own `toMessage` and publishes it on the session
  * bus (which relays it to the transport) — and is BOUND ONCE per (session,
@@ -25,19 +25,17 @@ import { useColabStore } from "./useColabStore.js";
 /** The bound action surface an interaction exposes to React consumers. */
 export interface InteractionActions {
   /** Map `input` via the descriptor's `toMessage` and publish it. */
-  send(input: unknown): void;
+  send: (input: unknown) => void;
 }
 
 /** The value returned by {@link useInteraction}. */
-export interface UseInteractionResult<S> {
+export interface UseInteractionResult<S> extends InteractionActions {
   /** The interaction's current reduced state, or `undefined` before first fold. */
   state: S | undefined;
-  /** The interaction's bound actions (stable across renders). */
-  actions: InteractionActions;
 }
 
 /**
- * Read `interaction`'s state slice and bound actions from the active session.
+ * Read `interaction`'s state slice and bound sender from the active session.
  *
  * @throws when the interaction is not registered, or when used outside a
  *   `<ColabProvider>`.
@@ -61,14 +59,12 @@ export function useInteraction<S>(
   const state = useColabStore(key, selector);
 
   // Bound once per (session, interaction): stable action identity.
-  const actions = useMemo<InteractionActions>(
-    () => ({
-      send: (input: unknown): void => {
-        session.bus.publish(interaction.toMessage(input));
-      },
-    }),
+  const send = useCallback(
+    (input: unknown): void => {
+      session.bus.publish(interaction.toMessage(input));
+    },
     [session, interaction],
   );
 
-  return { state, actions };
+  return useMemo<UseInteractionResult<S>>(() => ({ state, send }), [state, send]);
 }
