@@ -35,3 +35,14 @@ export { createSession } from "./core/index.js";
 export type { Session, SessionDeps } from "./core/index.js";
 
 export { createInMemoryStore } from "./store/index.js";
+
+export {
+  createInMemoryTransport,
+  createHub,
+  defaultHub,
+} from "./transport/index.js";
+export type {
+  InMemoryTransportOptions,
+  Hub,
+  HubListener,
+} from "./transport/index.js";
