@@ -49,3 +49,14 @@ export type {
   SocketIoTransportOptions,
   SocketAuth,
 } from "./transport/index.js";
+
+export {
+  resolveIdentity,
+  createIdentityProvider,
+  InvalidIdentityError,
+} from "./identity/index.js";
+export type {
+  ColabCredentials,
+  IdentityInput,
+  IdentityProvider,
+} from "./identity/index.js";

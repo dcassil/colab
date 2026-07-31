@@ -23,6 +23,7 @@
 import type { ColabMessage, Identity } from "colab-protocol";
 
 import type { ColabTransport } from "../contracts/transport.js";
+import type { ColabCredentials } from "../identity/identityProvider.js";
 
 /** The handshake `auth` payload placed in the socket.io connection options. */
 export interface SocketAuth {
@@ -38,6 +39,13 @@ export interface SocketIoTransportOptions {
   url: string;
   /** Room to join after the socket connects. Defaults to "default". */
   room?: string;
+  /**
+   * Resolved credentials (the shared {@link ColabCredentials} shape produced by
+   * the identity path's `resolveIdentity`). When present, its `identity`/`token`
+   * populate the handshake `auth`, taking precedence over the loose
+   * `identity`/`token` fields below.
+   */
+  credentials?: ColabCredentials;
   /** Self-asserted identity; carried into the handshake `auth`. */
   identity?: Identity;
   /** Credential; carried into the handshake `auth` (server-verified). */
@@ -63,8 +71,11 @@ const MSG_EVENT = "colab:msg";
 
 function buildAuth(opts: SocketIoTransportOptions): SocketAuth {
   const auth: SocketAuth = {};
-  if (opts.identity !== undefined) auth.identity = opts.identity;
-  if (opts.token !== undefined) auth.token = opts.token;
+  // Resolved `credentials` (from the identity path) win over the loose fields.
+  const identity = opts.credentials?.identity ?? opts.identity;
+  const token = opts.credentials?.token ?? opts.token;
+  if (identity !== undefined) auth.identity = identity;
+  if (token !== undefined) auth.token = token;
   return auth;
 }
 

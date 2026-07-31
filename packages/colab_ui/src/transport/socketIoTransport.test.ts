@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { resolveIdentity } from "../identity/identityProvider.js";
+
 import { createSocketIoTransport } from "./socketIoTransport.js";
 import { runTransportContract } from "./transportContract.js";
 
@@ -119,6 +121,21 @@ describe("createSocketIoTransport lazy import + handshake", () => {
     await t.connect();
 
     expect(ioCalls).toHaveLength(1);
+    expect(ioCalls[0]?.auth).toEqual({ identity, token: "jwt" });
+  });
+
+  // TC-004: resolved credentials travel unbroken into the handshake auth.
+  it("places resolveIdentity credentials into the io() handshake auth", async () => {
+    const identity = { id: "a", name: "A", color: "#0f0" };
+    const creds = await resolveIdentity({ identity, token: "jwt" });
+    const t = createSocketIoTransport({
+      url: "wss://test/r",
+      room: "r",
+      credentials: creds,
+    });
+
+    await t.connect();
+
     expect(ioCalls[0]?.auth).toEqual({ identity, token: "jwt" });
   });
 
