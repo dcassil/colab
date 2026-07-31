@@ -8,8 +8,8 @@
  * {@link ScopeId} with helpers, and the {@link JsonValue} space.
  *
  * This package is the leaf: it has zero third-party runtime dependencies and
- * zero DOM/framework imports, and it carries no CMS / iframe / DOM / geometry
- * vocabulary. Every exported type is structured-clone-safe by construction.
+ * zero DOM/framework imports, and it carries no host, embedding, layout, or
+ * positional vocabulary. Every exported type is structured-clone-safe by construction.
  */
 
 export type { JsonValue, JsonObject } from "./json.js";

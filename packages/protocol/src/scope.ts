@@ -2,8 +2,8 @@
  * `ScopeId` — an opaque, branded identifier for a collaboration scope.
  *
  * A `ScopeId` names *some* region a participant can point at or interact
- * within. It is an opaque string: the protocol attaches NO CMS, iframe, DOM,
- * element, selector, or geometry meaning to it. Consumers mint scope ids from
+ * within. It is an opaque string: the protocol attaches NO host, document,
+ * element, selector, layout, or positional meaning to it. Consumers mint scope ids from
  * whatever addressing scheme their domain uses; the protocol only guarantees
  * the value is a non-empty string and carries the `ScopeId` brand for
  * compile-time distinction from bare strings.

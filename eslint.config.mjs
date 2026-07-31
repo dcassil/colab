@@ -32,6 +32,10 @@ export default tseslint.config(
       "**/node_modules/**",
       "**/*.tsbuildinfo",
       "eslint.config.mjs",
+      // CI tool scripts (Node ESM, run via `node`, not part of any package
+      // source program). The neutrality guard lives here; its pure matcher is
+      // type-checked for consumers via a sibling `.d.mts` declaration.
+      "scripts/**",
     ],
   },
 

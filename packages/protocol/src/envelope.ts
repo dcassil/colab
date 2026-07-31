@@ -9,7 +9,7 @@ import type { ScopeId } from "./scope.js";
  *
  * `name` identifies the interaction kind (matched against the consumer's
  * interaction registry); `scopeId` locates it; `data` is an open,
- * structured-clone-safe bag. No CMS/DOM/geometry meaning is implied.
+ * structured-clone-safe bag. No host, layout, or domain meaning is implied.
  */
 export interface InteractionPayload {
   /** The interaction kind, matched against the consumer's registry. */

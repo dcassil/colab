@@ -2,8 +2,8 @@
  * Event-name constants for the `colab` wire.
  *
  * Two disjoint constant sets mirror the client/server split (the neutral
- * re-derivation of the source's presence event split, with all CMS naming
- * removed):
+ * re-derivation of the source's presence event split, with all host-domain
+ * naming removed):
  *
  *   - {@link COLAB_EVENTS}        — client → bus/server message types.
  *   - {@link COLAB_SERVER_EVENTS} — server → client lifecycle events.

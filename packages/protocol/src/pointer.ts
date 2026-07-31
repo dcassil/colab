@@ -3,7 +3,7 @@ import type { ScopeId } from "./scope.js";
 /**
  * `PointerPosition` — a neutral 2-D coordinate, optionally within a scope.
  *
- * NEUTRALITY CONTRACT: `protocol` holds NO transform, projection, or geometry
+ * NEUTRALITY CONTRACT: `protocol` holds NO transform, projection, or spatial
  * logic. `x` and `y` are plain numbers; their *interpretation* is entirely the
  * consumer's. The recommended default convention is that `x` and `y` are
  * anchor-relative fractions in the `0..1` range (so positions are resolution

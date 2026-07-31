@@ -52,3 +52,6 @@ jobs:
 
       - name: Depcruise (module boundaries)
         run: pnpm depcruise
+
+      - name: Neutrality guard (NFR-001)
+        run: pnpm neutrality

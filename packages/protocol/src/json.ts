@@ -8,7 +8,8 @@
  * `postMessage`, or `JSON.stringify` without loss.
  *
  * Used to constrain open-ended `extra` / payload shapes throughout the
- * protocol. No CMS, iframe, DOM, or geometry meaning is attached to it.
+ * protocol. It is a pure data space with no host, framework, layout, or
+ * domain meaning attached.
  */
 export type JsonValue =
   | string
