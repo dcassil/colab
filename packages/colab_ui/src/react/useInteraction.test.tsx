@@ -122,6 +122,7 @@ describe("useInteraction typed state + send (TC-001)", () => {
     const result: UseInteractionResult<LockState> = {
       state: { locked: true },
       send: () => undefined,
+      selectors: {},
     };
     const actions: InteractionActions = result;
     expectTypeOf(result.state).toEqualTypeOf<LockState | undefined>();

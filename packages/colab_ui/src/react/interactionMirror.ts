@@ -29,6 +29,17 @@ function targets(interaction: Interaction, message: ColabMessage): boolean {
   return payload?.name === interaction.type;
 }
 
+/**
+ * Read an OPTIONAL `initialState` off a registered interaction. The neutral I2
+ * `Interaction` seam declares none, but the T1 `defineInteraction` descriptor
+ * carries one; seeding from it satisfies the lifecycle contract's "fresh state
+ * per instance" so a descriptor's `reduce` never sees an unseeded `undefined`.
+ */
+function initialStateOf(interaction: Interaction): unknown {
+  const seed = (interaction as { initialState?: unknown }).initialState;
+  return seed;
+}
+
 /** Wire one interaction's fold; returns an unsubscribe closure. */
 function mirrorOne(
   session: Session,
@@ -36,6 +47,13 @@ function mirrorOne(
   interaction: Interaction,
 ): () => void {
   const key = interactionKey(interaction.type);
+
+  // Contract (1): seed a fresh slice from the descriptor's `initialState` so
+  // `reduce` folds onto a concrete seed and read hooks see it before any fold.
+  const seed = initialStateOf(interaction);
+  if (seed !== undefined && store.get(key) === undefined) {
+    store.set(key, seed);
+  }
 
   const fold = (message: ColabMessage): void => {
     if (!targets(interaction, message)) return;
