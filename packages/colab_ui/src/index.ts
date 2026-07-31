@@ -14,3 +14,10 @@ export type {
   ColabStore,
   Interaction,
 } from "./contracts/index.js";
+
+export { createMessageBus } from "./core/index.js";
+export type {
+  MessageBus,
+  MessageHandler,
+  BusErrorReporter,
+} from "./core/index.js";
