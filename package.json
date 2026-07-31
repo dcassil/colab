@@ -14,12 +14,15 @@
     "typecheck": "tsc -b",
     "build": "pnpm -r --filter \"./packages/*\" build",
     "lint": "eslint .",
-    "test": "pnpm -r test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "depcruise": "depcruise --config .dependency-cruiser.cjs packages example"
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
     "@eslint/js": "^9.39.5",
+    "@vitest/coverage-v8": "^3.2.7",
     "dependency-cruiser": "^16.10.4",
     "eslint": "^9.39.5",
     "eslint-import-resolver-alias": "^1.1.2",
@@ -28,7 +31,8 @@
     "eslint-plugin-import": "^2.32.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.65.0",
+    "vitest": "^3.2.7"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

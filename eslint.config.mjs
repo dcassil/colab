@@ -248,4 +248,21 @@ export default tseslint.config(
       ],
     },
   },
+
+  // TEST OVERRIDE (boundaries) — placed AFTER the boundaries block so it wins.
+  // Test files are graph leaves that legitimately reach across packages to
+  // exercise them directly; they are not part of the architecture graph.
+  // The escape-hatch bans (any / ts-comment / eslint-disable) remain in force.
+  {
+    files: [
+      "packages/*/src/**/*.test.{ts,tsx}",
+      "packages/*/src/**/__tests__/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "boundaries/dependencies": "off",
+      "boundaries/no-unknown-dependencies": "off",
+      "boundaries/no-unknown-files": "off",
+      "no-restricted-imports": "off",
+    },
+  },
 );

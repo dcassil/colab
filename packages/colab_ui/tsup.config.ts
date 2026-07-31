@@ -7,4 +7,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   external: ["@colab/protocol"],
+  tsconfig: "tsconfig.build.json",
 });
