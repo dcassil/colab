@@ -1,0 +1,29 @@
+{
+  "name": "colab-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Universal, drop-in real-time collaboration/presence for any web app (monorepo root).",
+  "license": "MIT",
+  "author": "Daniel Cassil <me@danielcassil.com>",
+  "packageManager": "pnpm@10.33.1",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "typecheck": "tsc -b",
+    "build": "pnpm -r --filter \"./packages/*\" build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "depcruise": "pnpm -r depcruise"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

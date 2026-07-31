@@ -1,0 +1,10 @@
+{
+  "name": "example",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Reserved example app (I7). Placeholder skeleton only.",
+  "scripts": {
+    "build": "echo \"example: reserved skeleton, no build yet\" && exit 0"
+  }
+}

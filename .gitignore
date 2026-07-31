@@ -2,8 +2,8 @@ node_modules/
 dist/
 *.log
 .DS_Store
-.metis/metis.db
-.metis/*.log
+.metis/
 orchestration/
+*.tsbuildinfo
 # iCloud sync dups (defensive)
 * [0-9].*
