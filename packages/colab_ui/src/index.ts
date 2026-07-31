@@ -1,13 +1,16 @@
 /**
- * colab-ui — public entry (skeleton).
+ * colab-ui — framework-agnostic collaboration core (public entry).
  *
- * Framework-agnostic core + React binding land in initiatives I2–I5.
+ * Exposes the seam CONTRACTS the core depends on ({@link ColabTransport},
+ * {@link ColabStore}, {@link Interaction}). Concrete implementations of these
+ * seams are supplied by downstream initiatives (I3 transport/store, I5
+ * interactions), never by this package. Core primitives (MessageBus, Roster,
+ * InteractionRegistry, Session) are added by later I2 tasks.
+ *
  * May import `colab-protocol`; must never import `colab-server`.
  */
-import { COLAB_EVENTS } from "colab-protocol";
-
-/** Package name marker, replaced by real UI/core exports downstream. */
-export const COLAB_UI_PACKAGE = "colab-ui" as const;
-
-/** Proves the protocol project reference resolves at build time. */
-export const PROTOCOL_LINK = COLAB_EVENTS.JOIN;
+export type {
+  ColabTransport,
+  ColabStore,
+  Interaction,
+} from "./contracts/index.js";
