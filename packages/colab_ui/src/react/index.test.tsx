@@ -6,6 +6,7 @@ import type { Identity } from "colab-protocol";
 import * as reactEntry from "./index.js";
 import { createFakeStore, createFakeTransport } from "../__tests__/fakes.js";
 import {
+  AvatarStack,
   ColabStage,
   ColabStageContext,
   ColabProvider,
@@ -16,6 +17,7 @@ import {
   usePresence,
 } from "./index.js";
 import type {
+  AvatarStackProps,
   ColabProviderProps,
   ColabStore,
   ColabTransport,
@@ -32,6 +34,7 @@ describe("React entry public surface (TC-001)", () => {
     const keys = Object.keys(reactEntry).sort();
     expect(keys).toEqual(
       [
+        "AvatarStack",
         "ColabStage",
         "ColabStageContext",
         "ColabProvider",
@@ -68,6 +71,7 @@ describe("React entry happy path (TC-002)", () => {
       transport: createFakeTransport() satisfies ColabTransport,
       store: createFakeStore() satisfies ColabStore,
     };
+    const stackProps: AvatarStackProps = { max: 3 };
 
     function Roster(): null {
       const session: Session = useColab();
@@ -104,8 +108,10 @@ describe("React entry happy path (TC-002)", () => {
     const transform: Transform = identityTransform;
     void ColabStage;
     void ColabStageContext;
+    void AvatarStack;
     void useColabStage;
     void box;
+    void stackProps;
     expect(transform(point)).toBe(point);
     expect(true).toBe(true);
   });
