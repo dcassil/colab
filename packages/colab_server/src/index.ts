@@ -1,3 +1,4 @@
+export { allowAll, type AuthToken, type VerifyIdentity } from "./auth.js";
 export {
   CLIENT_MESSAGE_EVENTS,
   isRelayMessage,
