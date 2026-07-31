@@ -109,6 +109,28 @@ module.exports = {
       to: { path: "^(packages/colab_server/|colab-server($|/))" },
     },
 
+    /* ---- Socket-free barrel: no STATIC edge to socket.io-client --------- */
+    {
+      name: "no-socketio-from-core-barrel",
+      comment:
+        "socket.io-client is an OPTIONAL battery. colab_ui source may reference " +
+        "it ONLY through a dynamic `await import(\"socket.io-client\")` inside the " +
+        "SocketIoTransport — never via a static import (value OR type). A static " +
+        "edge would put the whole socket.io graph on every consumer's static " +
+        "path, defeating tree-shaking and the 'removable batteries' guarantee.",
+      severity: "error",
+      from: {
+        path: "^packages/colab_ui/src",
+        pathNot: "\\.(test|spec)\\.[tj]sx?$",
+      },
+      to: {
+        path: "(^|/)socket\\.io-client($|/)|node_modules/socket\\.io-client",
+        // A dynamic `import()` is the ONLY permitted reference; anything else
+        // (a top-level `import ... from`, a type-only import) is a static edge.
+        dependencyTypesNot: ["dynamic-import"],
+      },
+    },
+
     /* ---- Public-entry discipline (entry-point) --------------------------- */
     {
       name: "not-to-deep-import",

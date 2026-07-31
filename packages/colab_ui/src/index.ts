@@ -40,9 +40,12 @@ export {
   createInMemoryTransport,
   createHub,
   defaultHub,
+  createSocketIoTransport,
 } from "./transport/index.js";
 export type {
   InMemoryTransportOptions,
   Hub,
   HubListener,
+  SocketIoTransportOptions,
+  SocketAuth,
 } from "./transport/index.js";

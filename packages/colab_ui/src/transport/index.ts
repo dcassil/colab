@@ -15,3 +15,8 @@ export { createInMemoryTransport } from "./inMemoryTransport.js";
 export type { InMemoryTransportOptions } from "./inMemoryTransport.js";
 export { createHub, defaultHub } from "./hub.js";
 export type { Hub, HubListener } from "./hub.js";
+export { createSocketIoTransport } from "./socketIoTransport.js";
+export type {
+  SocketIoTransportOptions,
+  SocketAuth,
+} from "./socketIoTransport.js";

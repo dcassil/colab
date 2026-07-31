@@ -52,7 +52,10 @@ type ChannelCtor = new (name: string) => ChannelLike;
 
 function resolveChannel(name: string | undefined): ChannelLike | undefined {
   if (name === undefined) return undefined;
-  const ctor = (globalThis as { BroadcastChannel?: ChannelCtor })
+  // Read the constructor structurally via `unknown` so this stays correct
+  // whether or not an ambient `BroadcastChannel` global type is in scope, and
+  // whether or not the runtime actually provides one (feature detection).
+  const ctor = (globalThis as unknown as { BroadcastChannel?: ChannelCtor })
     .BroadcastChannel;
   if (ctor === undefined) return undefined;
   return new ctor(name);
