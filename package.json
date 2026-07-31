@@ -13,17 +13,24 @@
   "scripts": {
     "typecheck": "tsc -b",
     "build": "pnpm -r --filter \"./packages/*\" build",
-    "lint": "pnpm -r lint",
+    "lint": "eslint .",
     "test": "pnpm -r test",
     "depcruise": "pnpm -r depcruise"
   },
   "devDependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-import": "^2.32.0",
     "tsup": "^8.5.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.65.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "unrs-resolver"
     ]
   }
 }
