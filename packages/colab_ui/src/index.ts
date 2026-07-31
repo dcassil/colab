@@ -39,6 +39,14 @@ export type {
   InteractionDescriptor,
   InteractionSelectors,
 } from "./interaction/index.js";
+export { EditLock, EDIT_LOCK_TYPE, reconcileEditLocks } from "./interactions/edit-lock/index.js";
+export type {
+  EditLockAction,
+  EditLockEvent,
+  EditLockSelectors,
+  EditLockState,
+  ParticipantId,
+} from "./interactions/edit-lock/index.js";
 
 export { createInMemoryStore } from "./store/index.js";
 
