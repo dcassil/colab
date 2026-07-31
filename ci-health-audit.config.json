@@ -1,7 +1,7 @@
 {
   "language": "ts",
   "srcDir": "./packages",
-  "lastScore": 0,
+  "lastScore": 8.23,
   "threshold": -2,
   "weights": {
     "ts": {
