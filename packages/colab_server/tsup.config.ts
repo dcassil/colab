@@ -1,11 +1,12 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: ["src/bin.ts", "src/index.ts"],
   format: ["esm"],
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ["colab-protocol"],
-  tsconfig: "tsconfig.build.json",
+  external: ["colab-protocol", "socket.io"],
+  // Non-composite tsconfig for tsup's dts step (see protocol/tsup.config.ts).
+  tsconfig: "tsconfig.dts.json",
 });
