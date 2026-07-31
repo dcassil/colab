@@ -171,6 +171,12 @@ export default tseslint.config(
           ],
           extensions: [".ts", ".tsx", ".js"],
         },
+        // Resolves intra-package relative imports, including the ESM `.js`
+        // specifiers TypeScript rewrites to their sibling `.ts` sources.
+        typescript: {
+          alwaysTryTypes: true,
+          project: ["packages/*/tsconfig.json"],
+        },
       },
       // Folder-based classification (v7 default). `src` is the internal root of
       // each element, so the barrel `src/index.ts` is the element's public
