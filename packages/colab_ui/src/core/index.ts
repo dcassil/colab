@@ -9,3 +9,6 @@ export type { MessageBus, MessageHandler, BusErrorReporter } from "./bus.js";
 
 export { createRoster } from "./roster.js";
 export type { Roster } from "./roster.js";
+
+export { createInteractionRegistry } from "./registry.js";
+export type { InteractionRegistry } from "./registry.js";

@@ -23,3 +23,5 @@ export type {
 } from "./core/index.js";
 export { createRoster } from "./core/index.js";
 export type { Roster } from "./core/index.js";
+export { createInteractionRegistry } from "./core/index.js";
+export type { InteractionRegistry } from "./core/index.js";
