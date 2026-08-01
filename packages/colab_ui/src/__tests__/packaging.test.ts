@@ -25,17 +25,28 @@ const repoRoot = path.resolve(
 );
 const npmCache = path.join(tmpdir(), "colab-npm-cache");
 
+// Canonical lockstep version, derived from colab-protocol so a version bump
+// only needs to touch the package.json files, not this test.
+const canonicalVersion = (
+  JSON.parse(
+    readFileSync(
+      path.join(repoRoot, "packages/protocol/package.json"),
+      "utf8",
+    ),
+  ) as { version: string }
+).version;
+
 const specs: PackageSpec[] = [
   { name: "colab-protocol", dir: "packages/protocol" },
   {
     name: "colab-ui",
     dir: "packages/colab_ui",
-    dependencies: { "colab-protocol": "0.1.0" },
+    dependencies: { "colab-protocol": canonicalVersion },
   },
   {
     name: "colab-server",
     dir: "packages/colab_server",
-    dependencies: { "colab-protocol": "0.1.0", "socket.io": "4.8.1" },
+    dependencies: { "colab-protocol": canonicalVersion, "socket.io": "4.8.1" },
   },
 ];
 
@@ -75,7 +86,7 @@ describe("publish packaging", () => {
       expectDependencyRanges(pkg, spec.dependencies ?? {});
     }
 
-    expect([...versions]).toStrictEqual(["0.1.0"]);
+    expect([...versions]).toStrictEqual([canonicalVersion]);
   });
 
   it("packs only the npm metadata and the files allowlist", () => {
