@@ -1,12 +1,19 @@
 /**
  * The example app root — the one-line multiplayer story in one component.
  *
- * `<ColabProvider>` is wired with ONLY the three required props (`serverUrl`,
- * `room`, `identity`) plus the `interactions` array. No custom `transport` or
- * `store` is passed, so colab uses its DEFAULT Socket.IO transport and DEFAULT
- * in-memory store. No `transform` is passed either, so the coordinate seam stays
- * at colab's identity default — the geometry-free proof: cursors are positioned
- * from anchor-relative normalized 0–1 points with zero geometry math here.
+ * `<ColabProvider>` is wired with the three required props (`serverUrl`, `room`,
+ * `identity`) plus the `interactions` array, and the DEFAULT in-memory store
+ * (no `store` prop). No `transform` is passed either, so the coordinate seam
+ * stays at colab's identity default — the geometry-free proof: cursors are
+ * positioned from anchor-relative normalized 0–1 points with zero geometry
+ * math here.
+ *
+ * The one deviation from "defaults only" is the `transport` prop: it is a THIN
+ * shim over the default Socket.IO transport that only works around current
+ * upstream defects (connect/join ordering, missing handshake `roomId`, and the
+ * default transport's wire shape not matching the default server). See
+ * `./colab-transport` for the full write-up. It is NOT a different backend and
+ * should be deleted once the shipped defaults interoperate.
  *
  * A custom interaction is registered alongside the reference `Cursor` +
  * `EditLock` interactions purely by listing it in this array — no colab core
