@@ -21,9 +21,14 @@ import type { Identity, Interaction } from "colab-ui/react";
 
 import { Dashboard } from "./components/Dashboard.js";
 import { createDemoIdentity, ROOM, SERVER_URL } from "./colab-config.js";
+import { reactionPing } from "./interactions/reactionPing.js";
 
-/** All interactions registered on the session, in one place. */
-const INTERACTIONS: readonly Interaction[] = [Cursor, EditLock];
+/**
+ * All interactions registered on the session, in one place. The custom
+ * `reactionPing` sits right beside the reference `Cursor` + `EditLock` — it is
+ * registered by nothing more than appearing in this array. No colab core edit.
+ */
+const INTERACTIONS: readonly Interaction[] = [Cursor, EditLock, reactionPing];
 
 export function App(): ReactElement {
   // Mint the identity once per mount so a re-render never rejoins as a new peer.

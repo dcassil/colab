@@ -9,6 +9,8 @@ const r = (p: string): string => fileURLToPath(new URL(p, import.meta.url));
  */
 const colabAliases = {
   "colab-protocol": r("./packages/protocol/src/index.ts"),
+  // `colab-ui/react` MUST precede `colab-ui` so the subpath alias wins.
+  "colab-ui/react": r("./packages/colab_ui/src/react/index.ts"),
   "colab-ui": r("./packages/colab_ui/src/index.ts"),
   "colab-server": r("./packages/colab_server/src/index.ts"),
 };
@@ -50,6 +52,19 @@ export default defineConfig({
           name: "colab_server",
           root: "./packages/colab_server",
           include: ["src/**/*.test.ts"],
+        },
+      },
+      {
+        // The I7 example app: its custom-interaction reducer/toMessage unit
+        // tests. Resolves `colab-*` to source like the packages so it runs with
+        // no prior build. Playwright e2e (`example/e2e/**`) is a SEPARATE runner
+        // and is excluded here.
+        resolve: { alias: colabAliases },
+        test: {
+          name: "example",
+          root: "./example",
+          include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+          environmentMatchGlobs: [["src/**", "jsdom"]],
         },
       },
     ],

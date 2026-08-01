@@ -13,6 +13,7 @@ import { ColabStage, RemoteCursors, useCursorCapture } from "colab-ui/react";
 import type { Identity } from "colab-ui/react";
 
 import { LockableField } from "./LockableField.js";
+import { PingLayer } from "./PingLayer.js";
 import { Roster } from "./Roster.js";
 
 const STAGE_STYLE: CSSProperties = {
@@ -45,6 +46,7 @@ function StageContent({ identity }: { identity: Identity }): ReactElement {
         <strong style={{ color: identity.color }}>{identity.name}</strong>.
       </p>
       <LockableField identity={identity} />
+      <PingLayer />
       {/* The ONLY screen-space math in the whole app lives inside colab's
           <RemoteCursors>; this app passes no transform (identity default). */}
       <RemoteCursors />
