@@ -11,9 +11,11 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "typecheck": "tsc -b",
-    "build": "pnpm -r --filter \"./packages/*\" build",
+    "typecheck": "tsc -b && pnpm --filter example typecheck",
+    "build": "pnpm -r --filter \"./packages/*\" build && pnpm --filter example build",
     "lint": "eslint .",
+    "example": "node scripts/run-example.mjs",
+    "e2e": "pnpm --filter example e2e",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

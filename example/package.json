@@ -3,8 +3,26 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
-  "description": "Reserved example app (I7). Placeholder skeleton only.",
+  "description": "colab example app (I7) — one-line multiplayer: live cursors, roster, advisory edit-lock, and a custom interaction. No iframe, no CMS, no geometry.",
   "scripts": {
-    "build": "echo \"example: reserved skeleton, no build yet\" && exit 0"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "colab-ui": "workspace:*",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7",
+    "vitest": "^3.2.7"
   }
 }
