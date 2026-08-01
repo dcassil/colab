@@ -1,8 +1,8 @@
 {
   "name": "colab-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "description": "Socket.IO relay server for colab collaboration sessions.",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,23 +11,35 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./bin": {
-      "types": "./dist/bin.d.ts",
-      "import": "./dist/bin.js"
-    },
     "./package.json": "./package.json"
   },
   "bin": {
     "colab-server": "./dist/bin.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./dist/bin.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcassil/colab.git",
+    "directory": "packages/colab_server"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "colab-protocol": "workspace:*",
-    "socket.io": "^4.8.1"
+    "colab-protocol": "0.1.0",
+    "socket.io": "4.8.1"
   },
   "devDependencies": {
     "@types/node": "^20.19.0",
