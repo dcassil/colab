@@ -20,6 +20,7 @@
 // ── Provider + hooks (values) ────────────────────────────────────────────────
 export { ColabProvider } from "./ColabProvider.js";
 export { useColab } from "./useColab.js";
+export { useIdentity } from "./useIdentity.js";
 export { usePresence } from "./usePresence.js";
 export { useInteraction } from "./useInteraction.js";
 export { AvatarStack } from "../ui/avatar-stack/index.js";
@@ -36,6 +37,13 @@ export { RemoteCursors, useCursorCapture } from "../ui/remote-cursors/index.js";
 
 // ── Public error a consumer may catch ────────────────────────────────────────
 export { ColabProviderMissingError } from "./useColabContext.js";
+
+// ── I5 EditLock reference interaction (parallels the core entry export) ───────
+export { EditLock } from "../interactions/edit-lock/index.js";
+
+// ── Protocol symbols a `defineInteraction` author names at the boundary ──────
+export { asScopeId, createMessage, COLAB_EVENTS } from "colab-protocol";
+export type { ScopeId, ColabMessage } from "colab-protocol";
 
 // ── Binding-owned public types ───────────────────────────────────────────────
 export type { ColabProviderProps, GetToken } from "./types.js";
