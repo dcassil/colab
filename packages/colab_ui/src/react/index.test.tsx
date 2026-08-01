@@ -41,6 +41,10 @@ describe("React entry public surface (TC-001)", () => {
         "useColabStage",
         "useInteraction",
         "usePresence",
+        // I5 reference interaction + generic cursor UI.
+        "Cursor",
+        "RemoteCursors",
+        "useCursorCapture",
       ].sort(),
     );
     // Internal modules must NOT leak through the public entry.

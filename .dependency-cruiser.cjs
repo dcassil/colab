@@ -153,6 +153,32 @@ module.exports = {
       },
     },
 
+    /* ---- I5 interaction purity: no geometry/DOM/UI in interactions ------ */
+    {
+      name: "interactions-no-geometry-dom-ui",
+      comment:
+        "Interaction modules (interaction/ + interactions/) author PURE, " +
+        "transform-free descriptors. The coordinate `transform` seam is the " +
+        "ONLY route screen-space knowledge may enter, and it lives at the UI " +
+        "render layer — never in an interaction. So interactions must NOT " +
+        "import the coordinate/geometry module, the UI layer, the React " +
+        "binding, or react/react-dom directly. They may consume only the I2/I3/" +
+        "I4 public contracts (protocol, contracts/, core/) and the T1 factory.",
+      severity: "error",
+      from: {
+        path: "^packages/colab_ui/src/interactions?/",
+        pathNot: "\\.(test|spec)\\.[tj]sx?$",
+      },
+      to: {
+        path: [
+          "^packages/colab_ui/src/coordinate/",
+          "^packages/colab_ui/src/ui/",
+          "^packages/colab_ui/src/react/",
+          "(^|/)react(-dom)?($|/)",
+        ],
+      },
+    },
+
     /* ---- Hygiene -------------------------------------------------------- */
     {
       name: "no-circular",
