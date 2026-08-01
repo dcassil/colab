@@ -17,10 +17,11 @@ import type { ReactElement } from "react";
 
 import { EditLock } from "colab-ui";
 import { ColabProvider, Cursor } from "colab-ui/react";
-import type { Identity, Interaction } from "colab-ui/react";
+import type { ColabTransport, Identity, Interaction } from "colab-ui/react";
 
 import { Dashboard } from "./components/Dashboard.js";
 import { createDemoIdentity, ROOM, SERVER_URL } from "./colab-config.js";
+import { createBufferedSocketTransport } from "./colab-transport.js";
 import { reactionPing } from "./interactions/reactionPing.js";
 
 /**
@@ -34,11 +35,25 @@ export function App(): ReactElement {
   // Mint the identity once per mount so a re-render never rejoins as a new peer.
   const identity: Identity = useMemo(() => createDemoIdentity(), []);
 
+  // The DEFAULT Socket.IO transport, wrapped with a pre-connect send buffer to
+  // work around an upstream connect/join ordering bug (see ./colab-transport).
+  // Memoized on identity so a plain re-render never rebuilds the connection.
+  const transport: ColabTransport = useMemo(
+    () =>
+      createBufferedSocketTransport({
+        url: SERVER_URL,
+        room: ROOM,
+        identity,
+      }),
+    [identity],
+  );
+
   return (
     <ColabProvider
       serverUrl={SERVER_URL}
       room={ROOM}
       identity={identity}
+      transport={transport}
       interactions={INTERACTIONS}
     >
       <Dashboard identity={identity} />

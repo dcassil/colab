@@ -19,7 +19,7 @@ import { useState } from "react";
 import type { ReactElement } from "react";
 
 import { EditLock } from "colab-ui";
-import { useInteraction } from "colab-ui/react";
+import { useInteraction, usePresence } from "colab-ui/react";
 import type { Identity } from "colab-ui/react";
 
 /** The scope id naming this one field. Plain string on the wire. */
@@ -42,10 +42,18 @@ export function LockableField({
   identity: Identity;
 }): ReactElement {
   const { state, send } = useInteraction(EditLock);
+  const roster = usePresence();
   const [text, setText] = useState("");
 
   const owner = ownerOf(state);
-  const lockedByRemote = owner !== null && owner !== identity.id;
+  // Reconcile against the LIVE roster (leave-on-disconnect): a lock counts as
+  // remote-held only while its owner is still present. When the holder's tab
+  // closes, the server drops it from the roster and the lock frees here — no
+  // stale lock. (The reference EditLock also ships `reconcileEditLocks`, but the
+  // roster check is the minimal app-side reconciliation.)
+  const ownerPresent =
+    owner !== null && roster.some((participant) => participant.id === owner);
+  const lockedByRemote = ownerPresent && owner !== identity.id;
 
   return (
     <label style={{ display: "block", margin: "8px 0 20px" }}>

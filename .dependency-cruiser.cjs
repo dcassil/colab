@@ -223,7 +223,9 @@ module.exports = {
     // false `no-orphans` hits). Consistent with this config's stated intent that
     // built `dist` files are not source roots — only the public entry barrels
     // are legal cross-package targets, matched by PUBLIC_ENTRY above.
-    exclude: { path: "/dist/__tests__/" },
+    // Also exclude the example app's Vite build output (`example/dist/**`) — a
+    // bundled artifact, never a source root or cross-package import target.
+    exclude: { path: "/dist/__tests__/|^example/dist/" },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: "tsconfig.base.json" },
     enhancedResolveOptions: {
