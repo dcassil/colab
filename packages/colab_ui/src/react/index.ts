@@ -22,6 +22,7 @@ export { ColabProvider } from "./ColabProvider.js";
 export { useColab } from "./useColab.js";
 export { usePresence } from "./usePresence.js";
 export { useInteraction } from "./useInteraction.js";
+export { AvatarStack } from "../ui/avatar-stack/index.js";
 export {
   ColabStage,
   ColabStageContext,
@@ -42,6 +43,7 @@ export type {
   InteractionActions,
   UseInteractionResult,
 } from "./useInteraction.js";
+export type { AvatarStackProps } from "../ui/avatar-stack/index.js";
 export type {
   ColabStageContextValue,
   Point,
