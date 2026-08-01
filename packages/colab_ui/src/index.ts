@@ -21,6 +21,30 @@ export type {
   Interaction,
 } from "./contracts/index.js";
 
+// ── Protocol symbols a `defineInteraction` author must name at the boundary ──
+// Re-exported from the shared wire contract so consumers can type the message
+// envelope, mint a `ScopeId`, and reference the client event constants without
+// depending on `colab-protocol` directly.
+export {
+  asScopeId,
+  isScopeId,
+  createMessage,
+  COLAB_EVENTS,
+  COLAB_SERVER_EVENTS,
+} from "colab-protocol";
+export type {
+  ScopeId,
+  ColabMessage,
+  ColabMessageType,
+  MessageMap,
+  InteractionPayload,
+  Identity,
+  Participant,
+  PointerPosition,
+  ColabEvent,
+  ColabServerEvent,
+} from "colab-protocol";
+
 export { createMessageBus } from "./core/index.js";
 export type {
   MessageBus,

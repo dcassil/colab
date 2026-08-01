@@ -41,6 +41,7 @@ describe("React entry public surface (TC-001)", () => {
         "ColabProviderMissingError",
         "identity",
         "useColab",
+        "useIdentity",
         "useColabStage",
         "useInteraction",
         "usePresence",
@@ -48,6 +49,12 @@ describe("React entry public surface (TC-001)", () => {
         "Cursor",
         "RemoteCursors",
         "useCursorCapture",
+        // EditLock reference interaction (parallels the core entry).
+        "EditLock",
+        // Protocol symbols a defineInteraction author names at the boundary.
+        "asScopeId",
+        "createMessage",
+        "COLAB_EVENTS",
       ].sort(),
     );
     // Internal modules must NOT leak through the public entry.
