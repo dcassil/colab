@@ -1,6 +1,6 @@
 {
   "name": "colab-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Framework-free collaboration core and React binding for colab.",
   "main": "./dist/index.js",
@@ -37,7 +37,7 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
-    "colab-protocol": "0.1.0"
+    "colab-protocol": "0.1.1"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

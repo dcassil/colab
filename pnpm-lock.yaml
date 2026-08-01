@@ -86,7 +86,7 @@ importers:
   packages/colab_server:
     dependencies:
       colab-protocol:
-        specifier: 0.1.0
+        specifier: 0.1.1
         version: link:../protocol
       socket.io:
         specifier: 4.8.1
@@ -108,7 +108,7 @@ importers:
   packages/colab_ui:
     dependencies:
       colab-protocol:
-        specifier: 0.1.0
+        specifier: 0.1.1
         version: link:../protocol
     devDependencies:
       '@testing-library/react':
