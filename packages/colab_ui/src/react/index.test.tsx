@@ -53,6 +53,7 @@ describe("React entry public surface (TC-001)", () => {
         "EditLock",
         // Protocol symbols a defineInteraction author names at the boundary.
         "asScopeId",
+        "isScopeId",
         "createMessage",
         "COLAB_EVENTS",
       ].sort(),

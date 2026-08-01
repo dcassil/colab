@@ -42,7 +42,7 @@ export { ColabProviderMissingError } from "./useColabContext.js";
 export { EditLock } from "../interactions/edit-lock/index.js";
 
 // ── Protocol symbols a `defineInteraction` author names at the boundary ──────
-export { asScopeId, createMessage, COLAB_EVENTS } from "colab-protocol";
+export { asScopeId, isScopeId, createMessage, COLAB_EVENTS } from "colab-protocol";
 export type { ScopeId, ColabMessage } from "colab-protocol";
 
 // ── Binding-owned public types ───────────────────────────────────────────────
