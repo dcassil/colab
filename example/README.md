@@ -90,10 +90,10 @@ const INTERACTIONS: readonly Interaction[] = [Cursor, EditLock, reactionPing];
 </ColabProvider>
 ```
 
-> Note: this example also passes a `transport` prop — a thin shim over the
-> default Socket.IO transport that works around current upstream defects (see
-> [Known upstream issues](#known-upstream-issues)). It is not a different
-> backend and should disappear once the shipped defaults interoperate.
+> Note: no `transport` prop is passed. The provider builds the DEFAULT
+> Socket.IO transport from `serverUrl` / `room` / `identity`, which speaks the
+> default server's protocol directly (see
+> [Default transport — no app workaround](#default-transport--no-app-workaround)).
 
 ### 2. Roster + cursors via hooks — `src/components/Roster.tsx` / `Dashboard.tsx`
 
@@ -194,25 +194,29 @@ that case.
 - **Blank page / `send() called before connect()`** — you are likely running an
   older wiring or with React StrictMode; see below.
 
-## Known upstream issues
+## Default transport — no app workaround
 
-To make the DEFAULT happy path work end-to-end today, this example carries a few
-**small, clearly-scoped workarounds** for upstream defects. None edit colab
-source; all are filed back and should be removed once fixed:
+This example runs on the DEFAULT colab path with **no** app-level transport. The
+provider constructs the shipped `createSocketIoTransport` from `serverUrl` /
+`room` / `identity` (the example passes no `transport` prop). As of colab 0.1.1
+that default transport speaks the default server's real protocol end-to-end:
 
-1. **Transport connect/join ordering** — the provider calls `connect()` (async)
-   then immediately `joinRoom()` → `send()`, but the default Socket.IO transport
-   only has its socket after connect resolves, so it throws
-   `send() called before connect()`. Worked around by buffering pre-connect
-   sends (`src/colab-transport.ts`).
-2. **Handshake `roomId`** — the server derives the room from the socket
-   handshake `auth`, but the default transport's `auth` omits `roomId`, so the
-   server rejects the connection. Fixed here by putting `roomId` in the auth.
-3. **Wire-shape mismatch** — the default transport speaks a single `colab:msg`
-   event, while the default server listens/emits on per-type events
-   (`pointer`/`interaction` ↔ `roster`/`participant_*`/`server_*`). The example
-   transport speaks the server's actual protocol.
-4. **StrictMode relay safety** — under React StrictMode's double-invoked effects,
+- **Handshake auth** carries `roomId` + `identity`, so the server accepts the
+  connection and places the socket in the right room.
+- **Per-type wire events** — it emits/subscribes the `COLAB_EVENTS` /
+  `COLAB_SERVER_EVENTS` the server actually uses (pointer/interaction ↔
+  roster/participant/server), not a single opaque envelope.
+- **Pre-connect buffering** — sends issued before `connect()` resolves are
+  buffered and flushed on connect, so the provider's connect→join→send ordering
+  is safe.
+
+Earlier revisions of this example shipped a thin bridge transport to work around
+gaps in the core; that workaround has been **removed** now that the shipped
+default interoperates.
+
+### Remaining note
+
+**StrictMode relay safety** — under React StrictMode's double-invoked effects,
    the provider's cleanup clears the session and the outbound relay never
    recovers (peers see the roster but no cursors/locks/pings). The app therefore
    mounts **without** `<StrictMode>` (`src/main.tsx`).
