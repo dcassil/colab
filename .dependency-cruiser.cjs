@@ -34,8 +34,11 @@
  * @type {import('dependency-cruiser').IConfiguration}
  */
 
-// A sibling package's public entry: its built barrel `dist/index.{js,d.ts}`.
-const PUBLIC_ENTRY = "/dist/index\\.(js|d\\.ts)$";
+// A sibling package's public entry: its built root barrel `dist/index.{js,d.ts}`
+// OR a one-level subpath barrel `dist/<name>/index.{js,d.ts}` (e.g. the
+// `colab-ui/react` export → `dist/react/index.js`). Both are declared public
+// entries in the package's `exports`; any deeper built file is a deep import.
+const PUBLIC_ENTRY = "/dist/(index|[^/]+/index)\\.(js|d\\.ts)$";
 
 module.exports = {
   forbidden: [
@@ -194,7 +197,7 @@ module.exports = {
       from: {
         orphan: true,
         pathNot: [
-          "\\.d\\.ts$",
+          "\\.d\\.(ts|mts|cts)$",
           "(^|/)tsconfig\\.",
           "(^|/)(vitest|dependency-cruiser)\\.",
           "(^|/)tsup\\.config\\.",
@@ -213,6 +216,16 @@ module.exports = {
   ],
   options: {
     doNotFollow: { path: "node_modules" },
+    // Built TEST-HELPER artifacts (e.g. `dist/__tests__/fakes.js`) that `tsup`'s
+    // dts rollup emits alongside the public barrels. They are not part of the
+    // published API and never an import target from real cross-package code, so
+    // they must not be scanned as source roots (they would otherwise surface as
+    // false `no-orphans` hits). Consistent with this config's stated intent that
+    // built `dist` files are not source roots — only the public entry barrels
+    // are legal cross-package targets, matched by PUBLIC_ENTRY above.
+    // Also exclude the example app's Vite build output (`example/dist/**`) — a
+    // bundled artifact, never a source root or cross-package import target.
+    exclude: { path: "/dist/__tests__/|^example/dist/" },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: "tsconfig.base.json" },
     enhancedResolveOptions: {

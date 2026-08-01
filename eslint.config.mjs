@@ -131,11 +131,92 @@ export default tseslint.config(
     },
   },
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EXAMPLE APP (I7 / PROJ-I-0007) — the browser SPA that consumes colab's
+  // public surface. It gets the SAME strict type-aware rules, escape-hatch bans,
+  // size ceilings, and react-hooks correctness rules as the packages — no
+  // relaxation — but with browser/DOM globals (its runtime) and its own tsconfig
+  // program. Module-boundary rules are applied by the shared boundaries block
+  // below (which already includes `example/src/**`).
+  // ═══════════════════════════════════════════════════════════════════════════
+  ...tseslint.configs.strictTypeChecked.map((c) => ({
+    ...c,
+    files: ["example/src/**/*.{ts,tsx}"],
+  })),
+  ...tseslint.configs.stylisticTypeChecked.map((c) => ({
+    ...c,
+    files: ["example/src/**/*.{ts,tsx}"],
+  })),
+  {
+    files: ["example/src/**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+      globals: {
+        window: "readonly",
+        document: "readonly",
+        crypto: "readonly",
+        console: "readonly",
+        HTMLElement: "readonly",
+        HTMLInputElement: "readonly",
+      },
+    },
+    plugins: {
+      "@eslint-community/eslint-comments": eslintComments,
+      "react-hooks": reactHooks,
+    },
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 200, skipBlankLines: true, skipComments: true },
+      ],
+      "max-lines-per-function": [
+        "error",
+        { max: 80, skipBlankLines: true, skipComments: true },
+      ],
+      complexity: ["error", 12],
+      "max-depth": ["error", 4],
+      "max-params": ["error", 4],
+      "max-nested-callbacks": ["error", 3],
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-non-null-assertion": "error",
+      "@typescript-eslint/ban-ts-comment": [
+        "error",
+        {
+          "ts-ignore": true,
+          "ts-expect-error": true,
+          "ts-nocheck": true,
+          "ts-check": false,
+        },
+      ],
+      "@eslint-community/eslint-comments/no-use": ["error", { allow: [] }],
+      "@eslint-community/eslint-comments/no-unlimited-disable": "error",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "error",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["colab-*/src/**", "colab-*/dist/**", "colab-*/src"],
+              message:
+                "Public-entry discipline: import a sibling package by its name " +
+                "(its public entry), never by reaching into its src/dist internals.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // TEST OVERRIDE — relax size ergonomics for tests; escape-hatch bans STAY on.
   {
     files: [
       "packages/*/src/**/*.test.{ts,tsx}",
       "packages/*/src/**/__tests__/**/*.{ts,tsx}",
+      "example/src/**/*.test.{ts,tsx}",
     ],
     rules: {
       "max-lines": "off",
@@ -188,6 +269,7 @@ export default tseslint.config(
         alias: {
           map: [
             ["colab-protocol", "./packages/protocol/src/index.ts"],
+            ["colab-ui/react", "./packages/colab_ui/src/react/index.ts"],
             ["colab-ui", "./packages/colab_ui/src/index.ts"],
             ["colab-server", "./packages/colab_server/src/index.ts"],
           ],
@@ -260,7 +342,14 @@ export default tseslint.config(
               from: { element: { type: "example" } },
               allow: {
                 to: {
-                  element: { type: "colab_ui", fileInternalPath: "index.ts" },
+                  element: {
+                    type: "colab_ui",
+                    // Both PUBLIC entries declared in colab_ui's package.json
+                    // `exports`: the core barrel (`index.ts`) and the React
+                    // binding barrel (`react/index.ts`). Any deeper path is still
+                    // a forbidden internal reach.
+                    fileInternalPath: ["index.ts", "react/index.ts"],
+                  },
                 },
               },
               message:
