@@ -81,3 +81,12 @@ export type {
   StageBox,
   Transform,
 } from "./coordinate/index.js";
+
+// ── I5 reference interactions (pure descriptors; geometry/DOM-free) ───────────
+// Additive: the parallel EditLock/AvatarStack exports reconcile alongside these.
+export { Cursor, createCursorInteraction, CURSOR_TYPE } from "./interactions/cursor/index.js";
+export type {
+  CursorPoint,
+  CursorState,
+  RemoteCursorEntry,
+} from "./interactions/cursor/index.js";

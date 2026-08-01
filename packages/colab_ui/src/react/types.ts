@@ -65,4 +65,10 @@ export interface ColabContextValue {
   store: ColabStore;
   /** Render-only normalized-point transform seam. */
   transform: Transform;
+  /**
+   * The local participant's identity. Carried on context so hooks can stamp
+   * outbound messages with the correct sender `from` (the pure descriptor
+   * `toMessage` cannot know it) and so UI can exclude self / read self name+color.
+   */
+  identity: Identity;
 }

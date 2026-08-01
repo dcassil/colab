@@ -63,8 +63,9 @@ export function ColabProvider(props: ColabProviderProps): React.ReactElement {
     () => ({
       ...sessionValue,
       transform: transform ?? identityTransform,
+      identity,
     }),
-    [sessionValue, transform],
+    [sessionValue, transform, identity],
   );
 
   const session = sessionValue.session;

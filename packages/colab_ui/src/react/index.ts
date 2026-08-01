@@ -29,6 +29,10 @@ export {
   useColabStage,
 } from "../coordinate/index.js";
 
+// ── I5 reference interaction + generic cursor UI (additive) ───────────────────
+export { Cursor } from "../interactions/cursor/index.js";
+export { RemoteCursors, useCursorCapture } from "../ui/remote-cursors/index.js";
+
 // ── Public error a consumer may catch ────────────────────────────────────────
 export { ColabProviderMissingError } from "./useColabContext.js";
 
@@ -46,6 +50,15 @@ export type {
   StageBox,
   Transform,
 } from "../coordinate/index.js";
+export type {
+  CursorPoint,
+  CursorState,
+  RemoteCursorEntry,
+} from "../interactions/cursor/index.js";
+export type {
+  RemoteCursorsProps,
+  RemoteCursorRenderArgs,
+} from "../ui/remote-cursors/index.js";
 
 // ── Consumed I2/I3 types a React consumer must name at the boundary ──────────
 export type { Identity, Participant } from "colab-protocol";
