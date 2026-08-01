@@ -120,6 +120,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.4
         version: 19.2.4(@types/react@19.2.18)
+      colab-server:
+        specifier: workspace:*
+        version: link:../colab_server
       react:
         specifier: ^19.2.8
         version: 19.2.8
