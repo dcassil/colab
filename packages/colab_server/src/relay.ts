@@ -1,9 +1,14 @@
 import { COLAB_EVENTS, COLAB_SERVER_EVENTS, createMessage } from "colab-protocol";
-import type { Participant } from "colab-protocol";
+import type { InteractionPayload, Participant } from "colab-protocol";
 import type { Server, Socket } from "socket.io";
 
 import { allowAll, type VerifyIdentity } from "./auth.js";
 import { readJoinRequest } from "./handshake.js";
+import {
+  RoomInteractionStore,
+  toClearPayload,
+  toLockPayload,
+} from "./interaction-state.js";
 import { RoomRosterStore, toParticipant } from "./roster.js";
 import type {
   ClientToServerEvents,
@@ -38,6 +43,7 @@ interface JoinedSocket {
 interface RelayContext {
   joinedSockets: Map<string, JoinedSocket>;
   roster: RoomRosterStore;
+  interactions: RoomInteractionStore;
 }
 
 export function attachColabRelay(io: ColabIo, options: RelayOptions = {}): void {
@@ -45,6 +51,7 @@ export function attachColabRelay(io: ColabIo, options: RelayOptions = {}): void 
   const context: RelayContext = {
     joinedSockets: new Map<string, JoinedSocket>(),
     roster: new RoomRosterStore(),
+    interactions: new RoomInteractionStore(),
   };
 
   io.use((socket, next) => {
@@ -97,6 +104,25 @@ function joinSocket(socket: ColabSocket, context: RelayContext): void {
     COLAB_SERVER_EVENTS.ROSTER,
     createMessage(COLAB_SERVER_EVENTS.ROSTER, "server", { participants }),
   );
+
+  // STATE SNAPSHOT: replay the room's current state-bearing interactions
+  // (active locks) to the NEWLY-JOINED socket only. Each active lock is
+  // re-expressed as a normal `server_interaction` carrying the SAME neutral
+  // payload the holder originally sent (name/scopeId + action:"lock"), keyed by
+  // the holder's id in `from`. The client's existing interaction fold folds it
+  // verbatim, so the joiner immediately reflects existing locks — no new
+  // protocol surface needed.
+  for (const active of context.interactions.list(request.roomId)) {
+    socket.emit(
+      COLAB_SERVER_EVENTS.INTERACTION,
+      createMessage(
+        COLAB_SERVER_EVENTS.INTERACTION,
+        active.holder,
+        toLockPayload(active),
+      ),
+    );
+  }
+
   socket.to(request.roomId).emit(
     COLAB_SERVER_EVENTS.PARTICIPANT_JOINED,
     createMessage(COLAB_SERVER_EVENTS.PARTICIPANT_JOINED, participant.id, participant),
@@ -123,6 +149,10 @@ function bindRelayHandlers(socket: ColabSocket, context: RelayContext): void {
     if (joined?.participant.id !== message.from) {
       return;
     }
+
+    // Update authoritative per-room interaction state so late joiners can be
+    // caught up on join (no-op for non-state-bearing interactions).
+    context.interactions.apply(joined.roomId, message.from, message.payload);
 
     socket.to(joined.roomId).emit(
       COLAB_SERVER_EVENTS.INTERACTION,
@@ -180,6 +210,18 @@ function leaveSocket(
   }
 
   context.joinedSockets.delete(socket.id);
+
+  // RECONCILE: drop every lock held by the departing participant and broadcast
+  // a matching `clear` for each, so stale locks from a gone participant never
+  // linger for the remaining peers (server-driven equivalent of the client's
+  // `reconcileEditLocks`).
+  for (const dropped of context.interactions.dropParticipant(joined.roomId, leavingId)) {
+    const clearPayload: InteractionPayload = toClearPayload(dropped);
+    socket.to(joined.roomId).emit(
+      COLAB_SERVER_EVENTS.INTERACTION,
+      createMessage(COLAB_SERVER_EVENTS.INTERACTION, leavingId, clearPayload),
+    );
+  }
 
   if (context.roster.leave(joined.roomId, leavingId)) {
     socket.to(joined.roomId).emit(

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   COLAB_EVENTS,
   COLAB_SERVER_EVENTS,
+  asScopeId,
   createMessage,
   type ColabMessage,
   type Identity,
@@ -76,6 +77,57 @@ describeWhenListeningWorks("Socket.IO relay integration", () => {
     second.disconnect();
     expect(await left).toMatchObject({ payload: { id: bob.id } });
   });
+
+  it("syncs edit-lock state on join and reconciles it on disconnect", async () => {
+    server = createColabServer({ cors: { origin: "http://localhost" } });
+    const url = `http://127.0.0.1:${String(await server.listen(0, "127.0.0.1"))}`;
+
+    // Alice joins FIRST and sets a lock before anyone else is present.
+    const first = connectClient(url, "room-b", alice);
+    await waitForConnect(first);
+    first.emit(
+      COLAB_EVENTS.INTERACTION,
+      createMessage(COLAB_EVENTS.INTERACTION, alice.id, {
+        name: "edit-lock",
+        scopeId: asScopeId("cell-1"),
+        data: { action: "lock" },
+      }),
+    );
+    // Ensure the server has processed the lock before Bob joins.
+    await delay(30);
+
+    // (a) Bob joins AFTER the lock was set → receives it in his snapshot.
+    const second = connectClient(url, "room-b", bob);
+    const snapshotLock = waitForInteraction(second);
+    await waitForConnect(second);
+    expect(await snapshotLock).toMatchObject({
+      from: alice.id,
+      payload: { name: "edit-lock", scopeId: "cell-1", data: { action: "lock" } },
+    });
+
+    // (b) A lock set by the LATE joiner reaches the earlier client.
+    const aliceSeesBobLock = waitForInteraction(first);
+    second.emit(
+      COLAB_EVENTS.INTERACTION,
+      createMessage(COLAB_EVENTS.INTERACTION, bob.id, {
+        name: "edit-lock",
+        scopeId: asScopeId("cell-2"),
+        data: { action: "lock" },
+      }),
+    );
+    expect(await aliceSeesBobLock).toMatchObject({
+      from: bob.id,
+      payload: { name: "edit-lock", scopeId: "cell-2", data: { action: "lock" } },
+    });
+
+    // (c) On disconnect, the departed participant's locks are cleared for peers.
+    const aliceSeesClear = waitForInteraction(first);
+    second.disconnect();
+    expect(await aliceSeesClear).toMatchObject({
+      from: bob.id,
+      payload: { name: "edit-lock", scopeId: "cell-2", data: { action: "clear" } },
+    });
+  });
 });
 
 function connectClient(
@@ -141,6 +193,16 @@ function waitForParticipantLeft(
 ): Promise<ColabMessage<typeof COLAB_SERVER_EVENTS.PARTICIPANT_LEFT>> {
   return new Promise((resolve) => {
     client.once(COLAB_SERVER_EVENTS.PARTICIPANT_LEFT, (message) => {
+      resolve(message);
+    });
+  });
+}
+
+function waitForInteraction(
+  client: TestClient,
+): Promise<ColabMessage<typeof COLAB_SERVER_EVENTS.INTERACTION>> {
+  return new Promise((resolve) => {
+    client.once(COLAB_SERVER_EVENTS.INTERACTION, (message) => {
       resolve(message);
     });
   });
