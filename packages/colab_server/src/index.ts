@@ -8,6 +8,12 @@ export {
   type RelayClientEvent,
   type RelayMessage,
 } from "./protocol-adapter.js";
+export {
+  RoomInteractionStore,
+  toClearPayload,
+  toLockPayload,
+  type ActiveInteraction,
+} from "./interaction-state.js";
 export { attachColabRelay, type RelayOptions } from "./relay.js";
 export { RoomRosterStore, toParticipant } from "./roster.js";
 export {
