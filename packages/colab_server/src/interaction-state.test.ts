@@ -47,12 +47,38 @@ describe("RoomInteractionStore", () => {
     expect(store.list("room")).toEqual([]);
   });
 
-  it("lets a later lock on the same scope take over (last writer wins)", () => {
+  it("rejects a later lock on the same scope from a different holder", () => {
     const store = new RoomInteractionStore();
     store.apply("room", "alice", lock());
+    expect(store.accepts("room", "bob", lock())).toBe(false);
+    expect(store.apply("room", "bob", lock())).toBe(false);
+    expect(store.list("room")).toEqual([
+      { name: "edit-lock", scopeId: scopeA, holder: "alice" },
+    ]);
+  });
+
+  it("allows the current holder to refresh and release before another acquire", () => {
+    const store = new RoomInteractionStore();
+    expect(store.apply("room", "alice", lock())).toBe(true);
+    expect(store.accepts("room", "alice", lock())).toBe(true);
+    expect(store.apply("room", "alice", lock())).toBe(false);
+    expect(store.apply("room", "alice", clear())).toBe(true);
+
+    expect(store.accepts("room", "bob", lock())).toBe(true);
     expect(store.apply("room", "bob", lock())).toBe(true);
     expect(store.list("room")).toEqual([
       { name: "edit-lock", scopeId: scopeA, holder: "bob" },
+    ]);
+  });
+
+  it("rejects a clear from a participant that does not hold the lock", () => {
+    const store = new RoomInteractionStore();
+    store.apply("room", "alice", lock());
+
+    expect(store.accepts("room", "bob", clear())).toBe(false);
+    expect(store.apply("room", "bob", clear())).toBe(false);
+    expect(store.list("room")).toEqual([
+      { name: "edit-lock", scopeId: scopeA, holder: "alice" },
     ]);
   });
 

@@ -152,6 +152,9 @@ function bindRelayHandlers(socket: ColabSocket, context: RelayContext): void {
 
     // Update authoritative per-room interaction state so late joiners can be
     // caught up on join (no-op for non-state-bearing interactions).
+    if (!context.interactions.accepts(joined.roomId, message.from, message.payload)) {
+      return;
+    }
     context.interactions.apply(joined.roomId, message.from, message.payload);
 
     socket.to(joined.roomId).emit(

@@ -22,6 +22,7 @@ type TestClient = ClientSocket<ServerToClientEvents, ClientToServerEvents>;
 
 const alice: Identity = { id: "alice", name: "Alice", color: "#c00" };
 const bob: Identity = { id: "bob", name: "Bob", color: "#00c" };
+const charlie: Identity = { id: "charlie", name: "Charlie", color: "#0c0" };
 
 let server: ColabServer | undefined;
 const clients: TestClient[] = [];
@@ -128,6 +129,84 @@ describeWhenListeningWorks("Socket.IO relay integration", () => {
       payload: { name: "edit-lock", scopeId: "cell-2", data: { action: "clear" } },
     });
   });
+
+  it("enforces first-holder-wins edit locks at the relay", async () => {
+    server = createColabServer({ cors: { origin: "http://localhost" } });
+    const url = `http://127.0.0.1:${String(await server.listen(0, "127.0.0.1"))}`;
+    const scopeId = asScopeId("cell-race");
+
+    const first = connectClient(url, "room-c", alice);
+    await waitForConnect(first);
+    const second = connectClient(url, "room-c", bob);
+    await waitForConnect(second);
+
+    const bobSeesAliceLock = waitForInteraction(second);
+    first.emit(
+      COLAB_EVENTS.INTERACTION,
+      createMessage(COLAB_EVENTS.INTERACTION, alice.id, {
+        name: "edit-lock",
+        scopeId,
+        data: { action: "lock" },
+      }),
+    );
+    expect(await bobSeesAliceLock).toMatchObject({
+      from: alice.id,
+      payload: { name: "edit-lock", scopeId, data: { action: "lock" } },
+    });
+
+    second.emit(
+      COLAB_EVENTS.INTERACTION,
+      createMessage(COLAB_EVENTS.INTERACTION, bob.id, {
+        name: "edit-lock",
+        scopeId,
+        data: { action: "lock" },
+      }),
+    );
+    await expectNoInteraction(first);
+
+    const third = connectClient(url, "room-c", charlie);
+    const charlieSnapshot = waitForInteraction(third);
+    await waitForConnect(third);
+    expect(await charlieSnapshot).toMatchObject({
+      from: alice.id,
+      payload: { name: "edit-lock", scopeId, data: { action: "lock" } },
+    });
+
+    const bobSeesAliceClear = waitForInteraction(second);
+    first.emit(
+      COLAB_EVENTS.INTERACTION,
+      createMessage(COLAB_EVENTS.INTERACTION, alice.id, {
+        name: "edit-lock",
+        scopeId,
+        data: { action: "clear" },
+      }),
+    );
+    expect(await bobSeesAliceClear).toMatchObject({
+      from: alice.id,
+      payload: { name: "edit-lock", scopeId, data: { action: "clear" } },
+    });
+
+    const aliceSeesBobLock = waitForInteraction(first);
+    second.emit(
+      COLAB_EVENTS.INTERACTION,
+      createMessage(COLAB_EVENTS.INTERACTION, bob.id, {
+        name: "edit-lock",
+        scopeId,
+        data: { action: "lock" },
+      }),
+    );
+    expect(await aliceSeesBobLock).toMatchObject({
+      from: bob.id,
+      payload: { name: "edit-lock", scopeId, data: { action: "lock" } },
+    });
+
+    const aliceSeesBobClear = waitForInteraction(first);
+    second.disconnect();
+    expect(await aliceSeesBobClear).toMatchObject({
+      from: bob.id,
+      payload: { name: "edit-lock", scopeId, data: { action: "clear" } },
+    });
+  });
 });
 
 function connectClient(
@@ -211,6 +290,31 @@ function waitForInteraction(
 async function delay(milliseconds: number): Promise<void> {
   await new Promise<void>((resolve) => {
     setTimeout(resolve, milliseconds);
+  });
+}
+
+async function expectNoInteraction(
+  client: TestClient,
+  milliseconds = 50,
+): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      client.off(COLAB_SERVER_EVENTS.INTERACTION, onInteraction);
+      resolve();
+    }, milliseconds);
+    const onInteraction = (
+      message: ColabMessage<typeof COLAB_SERVER_EVENTS.INTERACTION>,
+    ): void => {
+      clearTimeout(timer);
+      reject(
+        new Error(
+          `unexpected interaction from ${message.from}: ${JSON.stringify(
+            message.payload,
+          )}`,
+        ),
+      );
+    };
+    client.once(COLAB_SERVER_EVENTS.INTERACTION, onInteraction);
   });
 }
 
