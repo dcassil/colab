@@ -4,7 +4,7 @@ import { COLAB_EVENTS } from "../events.js";
 import type { ColabMessage, ColabMessageType } from "../envelope.js";
 import type { Identity, Participant } from "../identity.js";
 import type { PointerPosition } from "../pointer.js";
-import { asScopeId, isScopeId } from "../scope.js";
+import { asScopeId, composeScopeId, isScopeId } from "../scope.js";
 import type { ScopeId } from "../scope.js";
 import {
   allMessages,
@@ -124,10 +124,12 @@ describe("ScopeId helpers at runtime and type level (AC)", () => {
     expect(() => asScopeId("")).toThrow();
     expect(isScopeId("x")).toBe(true);
     expect(isScopeId(1)).toBe(false);
+    expect(composeScopeId("x", "y")).toBe("1:x|1:y");
   });
 
   it("ScopeId is not assignable from a bare string without the helper", () => {
     expectTypeOf<string>().not.toExtend<ScopeId>();
     expectTypeOf(asScopeId("x")).toEqualTypeOf<ScopeId>();
+    expectTypeOf(composeScopeId("x", "y")).toEqualTypeOf<ScopeId>();
   });
 });

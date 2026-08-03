@@ -15,6 +15,7 @@ import {
   useColabStage,
   useInteraction,
   usePresence,
+  usePresenceCount,
 } from "./index.js";
 import type {
   AvatarStackProps,
@@ -45,6 +46,7 @@ describe("React entry public surface (TC-001)", () => {
         "useColabStage",
         "useInteraction",
         "usePresence",
+        "usePresenceCount",
         // I5 reference interaction + generic cursor UI.
         "Cursor",
         "RemoteCursors",
@@ -53,6 +55,7 @@ describe("React entry public surface (TC-001)", () => {
         "EditLock",
         // Protocol symbols a defineInteraction author names at the boundary.
         "asScopeId",
+        "composeScopeId",
         "isScopeId",
         "createMessage",
         "COLAB_EVENTS",
@@ -88,8 +91,10 @@ describe("React entry happy path (TC-002)", () => {
     function Roster(): null {
       const session: Session = useColab();
       const remotes: readonly Participant[] = usePresence();
+      const otherCount: number = usePresenceCount(identity.id);
       void session;
       void remotes;
+      void otherCount;
       return null;
     }
     const lock: Interaction<{ locked: boolean }> = {

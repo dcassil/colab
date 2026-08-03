@@ -8,9 +8,10 @@ import { createFakeStore, createFakeTransport } from "../__tests__/fakes.js";
 import type { FakeTransport } from "../__tests__/fakes.js";
 import type { ColabStore } from "../contracts/store.js";
 import { ColabProvider } from "./ColabProvider.js";
-import { interactionKey } from "./storeKeys.js";
+import { ROSTER_KEY, interactionKey } from "./storeKeys.js";
 import { ColabProviderMissingError } from "./useColabContext.js";
 import { usePresence } from "./usePresence.js";
+import { usePresenceCount } from "./usePresenceCount.js";
 
 const identity: Identity = { id: "me", name: "Me", color: "#fff" };
 const peerA: Participant = { id: "a", name: "A", color: "#a00" };
@@ -43,6 +44,32 @@ function mount(
     </ColabProvider>,
   );
   return { roster: () => roster, renders: () => renders, unmount: view.unmount };
+}
+
+function mountCount(
+  transport: FakeTransport,
+  store: ColabStore,
+): {
+  count: () => number;
+  unmount: () => void;
+} {
+  let count = 0;
+  function Reader(): null {
+    count = usePresenceCount(identity.id);
+    return null;
+  }
+  const view = render(
+    <ColabProvider
+      serverUrl="https://relay.example"
+      room="r"
+      identity={identity}
+      transport={transport}
+      store={store}
+    >
+      <Reader />
+    </ColabProvider>,
+  );
+  return { count: () => count, unmount: view.unmount };
 }
 
 function emitJoin(t: FakeTransport, p: Participant): void {
@@ -120,6 +147,24 @@ describe("usePresence ignores unrelated slices (TC-003)", () => {
     });
 
     expect(view.renders()).toBe(before);
+    view.unmount();
+  });
+});
+
+describe("usePresenceCount derives other participants (TC-004)", () => {
+  it("counts remotes and excludes self if a roster snapshot includes it", () => {
+    const t = createFakeTransport();
+    const store = createFakeStore();
+    const view = mountCount(t, store);
+    emitJoin(t, peerA);
+    emitJoin(t, peerB);
+    expect(view.count()).toBe(2);
+
+    act(() => {
+      store.set(ROSTER_KEY, [identity, peerA, peerB]);
+    });
+
+    expect(view.count()).toBe(2);
     view.unmount();
   });
 });

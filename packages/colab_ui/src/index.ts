@@ -27,6 +27,7 @@ export type {
 // depending on `colab-protocol` directly.
 export {
   asScopeId,
+  composeScopeId,
   isScopeId,
   createMessage,
   COLAB_EVENTS,

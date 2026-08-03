@@ -26,6 +26,30 @@ export function asScopeId(raw: string): ScopeId {
 }
 
 /**
+ * Compose several domain-owned address parts into one opaque `ScopeId`.
+ *
+ * The encoding is length-prefixed so different part arrays cannot collide
+ * accidentally, and it deliberately carries no domain delimiter semantics.
+ *
+ * @throws {TypeError} if called without parts or with a non-string part.
+ */
+export function composeScopeId(...parts: string[]): ScopeId {
+  if (parts.length === 0) {
+    throw new TypeError("composeScopeId: at least one part is required");
+  }
+  return asScopeId(
+    parts
+      .map((part) => {
+        if (typeof part !== "string") {
+          throw new TypeError("composeScopeId: all parts must be strings");
+        }
+        return `${String(part.length)}:${part}`;
+      })
+      .join("|"),
+  );
+}
+
+/**
  * Runtime type guard narrowing `x` to `ScopeId`.
  *
  * Mirrors {@link asScopeId}'s validity rule (non-empty string) without

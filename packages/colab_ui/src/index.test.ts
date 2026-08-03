@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { COLAB_EVENTS, asScopeId, createMessage } from "colab-protocol";
+import {
+  COLAB_EVENTS,
+  asScopeId,
+  createMessage,
+} from "colab-protocol";
 import type { ColabMessage } from "colab-protocol";
 
 import type { ColabStore, ColabTransport, Interaction } from "./index.js";

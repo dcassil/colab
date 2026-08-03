@@ -22,6 +22,7 @@ export { ColabProvider } from "./ColabProvider.js";
 export { useColab } from "./useColab.js";
 export { useIdentity } from "./useIdentity.js";
 export { usePresence } from "./usePresence.js";
+export { usePresenceCount } from "./usePresenceCount.js";
 export { useInteraction } from "./useInteraction.js";
 export { AvatarStack } from "../ui/avatar-stack/index.js";
 export {
@@ -42,7 +43,13 @@ export { ColabProviderMissingError } from "./useColabContext.js";
 export { EditLock } from "../interactions/edit-lock/index.js";
 
 // ── Protocol symbols a `defineInteraction` author names at the boundary ──────
-export { asScopeId, isScopeId, createMessage, COLAB_EVENTS } from "colab-protocol";
+export {
+  asScopeId,
+  composeScopeId,
+  isScopeId,
+  createMessage,
+  COLAB_EVENTS,
+} from "colab-protocol";
 export type { ScopeId, ColabMessage } from "colab-protocol";
 
 // ── Binding-owned public types ───────────────────────────────────────────────

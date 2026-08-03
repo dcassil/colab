@@ -15,7 +15,7 @@
 export type { JsonValue, JsonObject } from "./json.js";
 
 export type { ScopeId } from "./scope.js";
-export { asScopeId, isScopeId } from "./scope.js";
+export { asScopeId, composeScopeId, isScopeId } from "./scope.js";
 
 export type { Identity, Participant } from "./identity.js";
 

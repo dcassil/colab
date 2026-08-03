@@ -4,6 +4,7 @@ import {
   COLAB_EVENTS,
   COLAB_SERVER_EVENTS,
   asScopeId,
+  composeScopeId,
   createMessage,
   isScopeId,
 } from "./index.js";
@@ -29,6 +30,16 @@ describe("ScopeId brand helpers (TC-001)", () => {
     expect(isScopeId("x")).toBe(true);
     expect(isScopeId(5)).toBe(false);
     expect(isScopeId("")).toBe(false);
+  });
+
+  it("composeScopeId creates a non-colliding opaque id from multiple parts", () => {
+    const id: ScopeId = composeScopeId("target", "content");
+    expect(id).toBe("6:target|7:content");
+    expect(composeScopeId("a", "bc")).not.toBe(composeScopeId("ab", "c"));
+  });
+
+  it("composeScopeId requires at least one part", () => {
+    expect(() => composeScopeId()).toThrow(TypeError);
   });
 });
 
