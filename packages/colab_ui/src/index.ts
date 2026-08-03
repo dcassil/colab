@@ -28,6 +28,7 @@ export type {
 export {
   asScopeId,
   composeScopeId,
+  CURSOR_GONE_ACTION,
   isScopeId,
   createMessage,
   COLAB_EVENTS,
@@ -41,6 +42,10 @@ export type {
   InteractionPayload,
   Identity,
   Participant,
+  CursorData,
+  CursorGoneData,
+  CursorPointData,
+  NormalizedPoint,
   PointerPosition,
   ColabEvent,
   ColabServerEvent,
@@ -119,6 +124,7 @@ export type {
 // Additive: the parallel EditLock/AvatarStack exports reconcile alongside these.
 export { Cursor, createCursorInteraction, CURSOR_TYPE } from "./interactions/cursor/index.js";
 export type {
+  CursorEvent,
   CursorPoint,
   CursorState,
   RemoteCursorEntry,

@@ -10,3 +10,4 @@ export type {
   RemoteCursorRenderArgs,
 } from "./RemoteCursors.js";
 export { useCursorCapture } from "./useCursorCapture.js";
+export { useCursorSource } from "./useCursorSource.js";

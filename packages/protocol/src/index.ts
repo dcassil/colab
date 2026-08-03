@@ -21,6 +21,14 @@ export type { Identity, Participant } from "./identity.js";
 
 export type { PointerPosition } from "./pointer.js";
 
+export { CURSOR_GONE_ACTION } from "./cursor.js";
+export type {
+  CursorData,
+  CursorGoneData,
+  CursorPointData,
+  NormalizedPoint,
+} from "./cursor.js";
+
 export { COLAB_EVENTS, COLAB_SERVER_EVENTS } from "./events.js";
 export type { ColabEvent, ColabServerEvent } from "./events.js";
 

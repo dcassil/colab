@@ -21,7 +21,11 @@
  * `throttle: 50` bounds outbound publishing to ~≤20 msg/s/participant (the hook
  * enforces the trailing-edge coalescing per the lifecycle contract).
  */
-import { COLAB_EVENTS, asScopeId, createMessage } from "colab-protocol";
+import {
+  COLAB_EVENTS,
+  asScopeId,
+  createMessage,
+} from "colab-protocol";
 import type { ColabMessage } from "colab-protocol";
 
 import { defineInteraction } from "../../interaction/index.js";
@@ -32,6 +36,9 @@ export interface CursorPoint {
   x: number;
   y: number;
 }
+
+/** Local cursor event: a point when visible, or `null` when absent/gone. */
+export type CursorEvent = CursorPoint | null;
 
 /** Cursor interaction state: participant id → their latest normalized point. */
 export type CursorState = Record<string, CursorPoint | undefined>;
@@ -47,6 +54,30 @@ export const CURSOR_TYPE = "cursor";
 
 /** The scope every cursor message targets — cursors are stage-global. */
 const CURSOR_SCOPE = asScopeId("cursor");
+
+/** Wire action matching colab-protocol's exported `CURSOR_GONE_ACTION`. */
+const CURSOR_GONE_ACTION_VALUE = "gone";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isCursorPoint(value: unknown): value is CursorPoint {
+  return (
+    isRecord(value) &&
+    typeof value.x === "number" &&
+    typeof value.y === "number"
+  );
+}
+
+function omitParticipant(state: CursorState, participantId: string): CursorState {
+  if (state[participantId] === undefined) return state;
+  const next: CursorState = {};
+  for (const [key, value] of Object.entries(state)) {
+    if (key !== participantId) next[key] = value;
+  }
+  return next;
+}
 
 function entriesOf(state: CursorState): RemoteCursorEntry[] {
   const out: RemoteCursorEntry[] = [];
@@ -65,7 +96,7 @@ function entriesOf(state: CursorState): RemoteCursorEntry[] {
 export function createCursorInteraction(registry?: InteractionRegistry) {
   return defineInteraction<
     CursorState,
-    CursorPoint,
+    CursorEvent,
     {
       remoteCursors: (state: CursorState) => RemoteCursorEntry[];
       presentCursors: (
@@ -80,20 +111,25 @@ export function createCursorInteraction(registry?: InteractionRegistry) {
       // Immutable, keyed by the sender's envelope `from`. Tolerates an unseeded
       // `undefined` prev (the mirror seeds slices lazily).
       reduce: (state, message): CursorState => {
-        const payload = message.payload as
-          | { data?: { point?: CursorPoint } }
-          | undefined;
-        const point = payload?.data?.point;
-        if (point === undefined) return state;
+        const payload = message.payload as { data?: unknown } | undefined;
+        const data = payload?.data;
+        if (!isRecord(data)) return state;
+        if (data.action === CURSOR_GONE_ACTION_VALUE) {
+          return omitParticipant(state, message.from);
+        }
+        const point = data.point;
+        if (!isCursorPoint(point)) return state;
         return { ...state, [message.from]: point };
       },
-      // Normalized point only — NO transform applied (wire stays canonical).
-      toMessage: (point): ColabMessage =>
+      // Normalized point or explicit gone signal — NO transform applied.
+      toMessage: (event): ColabMessage =>
         createMessage(COLAB_EVENTS.INTERACTION, "", {
           name: CURSOR_TYPE,
           scopeId: CURSOR_SCOPE,
-          // Fresh JSON-safe literal (coords are numbers → valid `JsonValue`).
-          data: { point: { x: point.x, y: point.y } },
+          data:
+            event === null
+              ? { action: CURSOR_GONE_ACTION_VALUE }
+              : { point: { x: event.x, y: event.y } },
         }),
       selectors: {
         remoteCursors: (state) => entriesOf(state),

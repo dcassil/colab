@@ -13,6 +13,7 @@ import {
   identity as identityTransform,
   useColab,
   useColabStage,
+  useCursorSource,
   useInteraction,
   usePresence,
   usePresenceCount,
@@ -51,11 +52,13 @@ describe("React entry public surface (TC-001)", () => {
         "Cursor",
         "RemoteCursors",
         "useCursorCapture",
+        "useCursorSource",
         // EditLock reference interaction (parallels the core entry).
         "EditLock",
         // Protocol symbols a defineInteraction author names at the boundary.
         "asScopeId",
         "composeScopeId",
+        "CURSOR_GONE_ACTION",
         "isScopeId",
         "createMessage",
         "COLAB_EVENTS",
@@ -126,6 +129,7 @@ describe("React entry happy path (TC-002)", () => {
     void ColabStage;
     void ColabStageContext;
     void AvatarStack;
+    void useCursorSource;
     void useColabStage;
     void box;
     void stackProps;

@@ -2,6 +2,8 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { COLAB_EVENTS } from "../events.js";
 import type { ColabMessage, ColabMessageType } from "../envelope.js";
+import { CURSOR_GONE_ACTION } from "../cursor.js";
+import type { CursorData, NormalizedPoint } from "../cursor.js";
 import type { Identity, Participant } from "../identity.js";
 import type { PointerPosition } from "../pointer.js";
 import { asScopeId, composeScopeId, isScopeId } from "../scope.js";
@@ -67,6 +69,8 @@ describe("CloneSafe rejects un-clonable shapes (AC)", () => {
     // primitive-preserving branch keeps `x`/`y` as `number`.
     expectTypeOf<CloneSafe<PointerPosition>>().not.toBeNever();
     expectTypeOf<CloneSafe<PointerPosition>["x"]>().toEqualTypeOf<number>();
+    expectTypeOf<CloneSafe<NormalizedPoint>>().not.toBeNever();
+    expectTypeOf<CloneSafe<CursorData>>().not.toBeNever();
     expectTypeOf<CloneSafe<Identity>>().not.toBeNever();
     expectTypeOf<CloneSafe<Identity>["id"]>().toEqualTypeOf<string>();
 
@@ -74,6 +78,11 @@ describe("CloneSafe rejects un-clonable shapes (AC)", () => {
     expectTypeOf<CloneSafe<{ fn: () => void }>["fn"]>().toBeNever();
     expectTypeOf<CloneSafe<{ m: Map<string, number> }>["m"]>().toBeNever();
     expectTypeOf<CloneSafe<{ s: Set<number> }>["s"]>().toBeNever();
+  });
+
+  it("keeps cursor gone data structured-clone-safe", () => {
+    const data: CursorData = { action: CURSOR_GONE_ACTION };
+    expect(clone(data)).toEqual({ action: "gone" });
   });
 });
 

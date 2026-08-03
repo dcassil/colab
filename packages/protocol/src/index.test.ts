@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   COLAB_EVENTS,
   COLAB_SERVER_EVENTS,
+  CURSOR_GONE_ACTION,
   asScopeId,
   composeScopeId,
   createMessage,
@@ -76,5 +77,9 @@ describe("Envelope + event constant typing (TC-002)", () => {
       participants: [p],
     });
     expect(msg.payload.participants).toHaveLength(1);
+  });
+
+  it("exports the cursor-gone wire action literal", () => {
+    expect(CURSOR_GONE_ACTION).toBe("gone");
   });
 });

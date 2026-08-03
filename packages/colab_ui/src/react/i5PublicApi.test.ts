@@ -25,10 +25,11 @@ describe("I5 public exports resolve (TC-001)", () => {
     expect(core.identity({ x: 0.3, y: 0.7 })).toEqual({ x: 0.3, y: 0.7 });
   });
 
-  it("exposes Cursor + RemoteCursors + useCursorCapture from the react barrel", () => {
+  it("exposes Cursor + RemoteCursors + cursor source hooks from the react barrel", () => {
     expect(react.Cursor.type).toBe("cursor");
     expect(typeof react.RemoteCursors).toBe("function");
     expect(typeof react.useCursorCapture).toBe("function");
+    expect(typeof react.useCursorSource).toBe("function");
     expect(typeof react.ColabStage).toBe("function");
   });
 });

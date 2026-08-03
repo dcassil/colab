@@ -34,7 +34,11 @@ export {
 
 // ── I5 reference interaction + generic cursor UI (additive) ───────────────────
 export { Cursor } from "../interactions/cursor/index.js";
-export { RemoteCursors, useCursorCapture } from "../ui/remote-cursors/index.js";
+export {
+  RemoteCursors,
+  useCursorCapture,
+  useCursorSource,
+} from "../ui/remote-cursors/index.js";
 
 // ── Public error a consumer may catch ────────────────────────────────────────
 export { ColabProviderMissingError } from "./useColabContext.js";
@@ -46,6 +50,7 @@ export { EditLock } from "../interactions/edit-lock/index.js";
 export {
   asScopeId,
   composeScopeId,
+  CURSOR_GONE_ACTION,
   isScopeId,
   createMessage,
   COLAB_EVENTS,
@@ -69,6 +74,7 @@ export type {
 } from "../coordinate/index.js";
 export type {
   CursorPoint,
+  CursorEvent,
   CursorState,
   RemoteCursorEntry,
 } from "../interactions/cursor/index.js";
@@ -79,6 +85,12 @@ export type {
 
 // ── Consumed I2/I3 types a React consumer must name at the boundary ──────────
 export type { Identity, Participant } from "colab-protocol";
+export type {
+  CursorData,
+  CursorGoneData,
+  CursorPointData,
+  NormalizedPoint,
+} from "colab-protocol";
 export type { Session } from "../core/session.js";
 export type { ColabTransport } from "../contracts/transport.js";
 export type { ColabStore } from "../contracts/store.js";

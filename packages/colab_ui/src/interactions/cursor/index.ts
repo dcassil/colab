@@ -9,6 +9,7 @@ export {
   CURSOR_TYPE,
 } from "./cursor.js";
 export type {
+  CursorEvent,
   CursorPoint,
   CursorState,
   RemoteCursorEntry,
