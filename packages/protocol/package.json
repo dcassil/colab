@@ -1,6 +1,6 @@
 {
   "name": "colab-protocol",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "description": "Shared wire protocol and neutral collaboration types for colab.",
   "main": "./dist/index.js",
