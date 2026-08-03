@@ -48,6 +48,9 @@ describe("React entry public surface (TC-001)", () => {
         "useInteraction",
         "usePresence",
         "usePresenceCount",
+        // Cooperative edit-lock hook + its default idle threshold.
+        "useEditLock",
+        "DEFAULT_IDLE_RELEASE_MS",
         // I5 reference interaction + generic cursor UI.
         "Cursor",
         "RemoteCursors",

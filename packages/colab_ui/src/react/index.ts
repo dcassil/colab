@@ -24,6 +24,7 @@ export { useIdentity } from "./useIdentity.js";
 export { usePresence } from "./usePresence.js";
 export { usePresenceCount } from "./usePresenceCount.js";
 export { useInteraction } from "./useInteraction.js";
+export { useEditLock, DEFAULT_IDLE_RELEASE_MS } from "./useEditLock.js";
 export { AvatarStack } from "../ui/avatar-stack/index.js";
 export {
   ColabStage,
@@ -63,6 +64,7 @@ export type {
   InteractionActions,
   UseInteractionResult,
 } from "./useInteraction.js";
+export type { EditLockStatus, UseEditLockOptions } from "./useEditLock.js";
 export type { AvatarStackProps } from "../ui/avatar-stack/index.js";
 export type {
   ColabStageContextValue,
